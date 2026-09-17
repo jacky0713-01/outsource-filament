@@ -423,7 +423,7 @@
     }));
 
     // 工作表資料結構 (Workbook Management)
-    let workbook = JSON.parse(localStorage.getItem('item_tracker_workbook')) || [
+    let workbook = JSON.parse(localStorage.getItem('outsource_filament_workbook')) || [
       { id: "sheet_1", name: "工作表 1", columns: defaultColumns, data: initialData }
     ];
     let activeSheetId = localStorage.getItem('item_tracker_active_sheet') || workbook[0].id;
@@ -837,7 +837,7 @@
     };
 
     function saveWorkbook() {
-      localStorage.setItem('item_tracker_workbook', JSON.stringify(workbook));
+      localStorage.setItem('outsource_filament_workbook', JSON.stringify(workbook));
       localStorage.setItem('item_tracker_active_sheet', activeSheetId);
     }
 
