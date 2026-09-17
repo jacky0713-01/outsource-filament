@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Filament Outsource Tracing</title>
+  <!-- 引入 html2canvas 支援一鍵截圖匯出圖片 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #0b1329;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 16px 24px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pro {
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #0284c7;
+      color: #fff;
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+
+    /* Excel 工作表 (Sheet) 列樣式 */
+    .sheet-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #0f172a;
+      padding: 6px 12px;
+      border-radius: 8px 8px 0 0;
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      overflow-x: auto;
+    }
+
+    .sheet-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card-bg);
+      color: var(--text-muted);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: grab;
+      border: 1px solid var(--border-color);
+      user-select: none;
+    }
+
+    .sheet-tab:active {
+      cursor: grabbing;
+    }
+
+    .sheet-tab.active {
+      background: #0284c7;
+      color: #fff;
+      border-color: #38bdf8;
+    }
+
+    .sheet-tab.drag-over {
+      border-left: 3px solid var(--accent) !important;
+      background-color: #334155;
+    }
+
+    .sheet-close {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      cursor: pointer;
+    }
+    .sheet-close:hover {
+      opacity: 1;
+      color: #f87171;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      background-color: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-primary { background-color: #0284c7; color: #fff; border: none; }
+    .btn-primary:hover { background-color: #0369a1; color: #fff; }
+    .btn-success { background-color: #10b981; color: #fff; border: none; }
+    .btn-success:hover { background-color: #059669; color: #fff; }
+
+    .tab-content {
+      display: none;
+      flex: 1;
+      overflow: auto;
+      background-color: var(--card-bg);
+      border-radius: 0 0 10px 10px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .tab-content.active { display: block; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background-color: #0f172a;
+      color: #94a3b8;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      user-select: none;
+    }
+
+    th[draggable="true"] { cursor: grab; }
+    th[draggable="true"]:active { cursor: grabbing; }
+    th.drag-over {
+      border-left: 3px solid var(--accent) !important;
+      background-color: #1e293b;
+    }
+
+    .del-col-btn {
+      margin-left: 6px;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+    .del-col-btn:hover { opacity: 1; }
+
+    td {
+      padding: 9px 16px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.88rem;
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    tr:hover td { background-color: rgba(255, 255, 255, 0.03); }
+
+    .progress-bar-bg {
+      background: #0f172a;
+      border-radius: 6px;
+      height: 10px;
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #34d399);
+      border-radius: 6px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .status-done { background: rgba(52, 211, 153, 0.15); color: var(--success); border: 1px solid var(--success); }
+    .status-doing { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid var(--accent); }
+    .status-todo { background: rgba(251, 191, 36, 0.15); color: var(--warning); border: 1px solid var(--warning); }
+
+    .gantt-table { table-layout: fixed; min-width: 1000px; }
+    .gantt-header-date { text-align: center; font-size: 0.75rem; border-left: 1px solid var(--border-color); }
+    .gantt-cell { position: relative; height: 36px; padding: 0 !important; border-left: 1px solid rgba(255, 255, 255, 0.05); }
+    .gantt-bar-wrapper {
+      position: absolute;
+      top: 6px;
+      height: 24px;
+      background: rgba(56, 189, 248, 0.25);
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .editable { cursor: pointer; }
+    .editable:hover {
+      background-color: rgba(56, 189, 248, 0.15) !important;
+      outline: 1px dashed var(--accent);
+    }
+
+    .action-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; }
+    .action-btn:hover { color: var(--danger); }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <div class="brand-title">
+        <span class="badge-pro">PRO ENTERPRISE</span>
+        <h1>Filament Outsource Tracing</h1>
+      </div>
+    </header>
+
+    <!-- 分頁頁籤 -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('tracker-tab')">📋 專案進度追蹤表</button>
+      <button class="tab-btn" onclick="switchTab('gantt-tab')">📅 自動生成甘特圖 (Gantt Chart)</button>
+    </div>
+
+    <!-- 工作表標籤列 (Excel 樣式) -->
+    <div class="sheet-bar">
+      <div id="sheets-container" style="display: flex; gap: 6px;"></div>
+      <button id="add-sheet-btn" class="btn" style="padding: 2px 8px; font-size: 0.8rem;" title="新增工作表">➕</button>
+      <button id="copy-sheet-btn" class="btn" style="padding: 2px 8px; font-size: 0.8rem;" title="複製當前工作表">📋 複製工作表</button>
+    </div>
+
+    <!-- 頁面一：專案進度追蹤表 -->
+    <div id="tracker-tab" class="tab-content active">
+      <div class="toolbar" style="padding: 12px 16px 0 16px;">
+        <button id="add-row-btn" class="btn btn-primary">➕ 新增料號項目</button>
+        <button id="add-col-btn" class="btn btn-primary">➕ 新增自訂欄位</button>
+        <button id="export-tracker-img-btn" class="btn btn-success">📸 匯出追蹤表圖片 (PNG)</button>
+      </div>
+      <div id="tracker-export-area" style="padding: 12px 16px;">
+        <table>
+          <thead id="table-head"></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 頁面二：動態甘特圖 -->
+    <div id="gantt-tab" class="tab-content">
+      <div class="toolbar" style="padding: 12px 20px 0 20px; justify-content: flex-end;">
+        <button id="export-gantt-img-btn" class="btn btn-success">📸 匯出甘特圖圖片 (PNG)</button>
+      </div>
+      <div id="gantt-export-area" style="padding: 12px 20px 20px 20px; overflow-x: auto;">
+        <h3 style="color: var(--accent); margin-top: 0;">📊 採購時程動態甘特圖 (Gantt Chart)</h3>
+        <table class="gantt-table">
+          <thead id="gantt-thead"></thead>
+          <tbody id="gantt-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const img1Items = [
+      "10091-VWNE000", "10021-VWNE000", "14967-VWNE001", "10014-VWTE000",
+      "10207-FWTE000", "10024-VWNE000", "14725-FWNE000", "10247-FWUE000",
+      "10031-FWTE001", "13876-VWNE000", "組合件", "(60039-VTAG100&61533-VWTG100)",
+      "F0024-VWNE000", "14799-FWNE000", "FV80-0433", "FSEC-0004W",
+      "FMTK-0121", "FNIR-0001M", "FAMT-0275", "FV810-5017",
+      "FVSE-0590-3", "FV810-5006-1", "FNI3-0012M", "FV80-0490",
+      "FVSE-1927", "FINT-0053", "FV810-0018N", "FV80-0459",
+      "FVSE-1762", "FVSE-0609-4", "FVSE-0343-2", "18385-FWNE000",
+      "FV810-0018P", "FVVX-77001-1", "FVSE-0143", "10227-FWNE000",
+      "FVSE-1715", "FV810-0206", "14967-FWNE000", "FVSE-1929",
+      "FSEC-0004W-M", "FVSE-0526-1", "10063-FWNE000", "FVSE-1861",
+      "FGSD-8120.", "FVSE-0397-3", "FAIB-1637", "FAPX-0044-2"
+    ];
+
+    const img2Skus = [
+      "FVSE-0036-4", "FVSE-0525-4", "FVSE-0032-4", "FVSE-0068",
+      "FV80-0433", "FVSE-0471-6", "FVEX-3030M", "FV810-0206WU",
+      "FDSI-0029-0036與FVSE-0036-4相同治具", "FVSE-0480-1", "6F001-04712223", "FVVX-69340T",
+      "10207-FWTE000", "10824-SWNE001", "10239-FTAE001", "13722-FWNE000",
+      "10020-AWTE000", "10014-FWTE000", "15299-VWNE000", "10063-FWUE000",
+      "13967-FWNE000", "10021-FWTE000", "18366-VWTE000", "13876-FWNE000",
+      "10226-FWNE000", "10024-FWNE000", "16809-VWNE000", "18385-VWNE000",
+      "10187-VWNE000", "18385-FWNE000", "10226-FWTE001", "10134-FWTE000",
+      "10134-VWTE000", "10227-FWNE000", "13909-VWTE000", "10247-FWTE000",
+      "14967-FWNE000", "18375-VWNE000", "10824-SWTE000", "10227-VWNE000",
+      "10063-FWNE000", "17568-VWNE000", "10206-FWNE000", "10207-VWTE000",
+      "12111-BWTE000"
+    ];
+
+    const defaultColumns = [
+      { key: "itemNo", label: "品號", isSystem: false },
+      { key: "sku", label: "貨號", isSystem: false },
+      { key: "purchaseNo", label: "採購料號", isSystem: false },
+      { key: "startDate", label: "開始日期", isSystem: false },
+      { key: "endDate", label: "結束日期", isSystem: false },
+      { key: "progress", label: "進度 (%)", isSystem: false },
+      { key: "status", label: "狀態", isSystem: false }
+    ];
+
+    const maxLen = Math.max(img1Items.length, img2Skus.length);
+    const initialData = [];
+    for (let i = 0; i < maxLen; i++) {
+      initialData.push({
+        itemNo: img1Items[i] || "-",
+        sku: img2Skus[i] || "-",
+        purchaseNo: `PO-2026-${String(i + 1).padStart(3, '0')}`,
+        startDate: "2026-03-01",
+        endDate: "2026-03-15",
+        progress: 0,
+        status: "未開始"
+      });
+    }
+
+    // 工作表資料結構 (Workbook Management)
+    let workbook = JSON.parse(localStorage.getItem('item_tracker_workbook')) || [
+      { id: "sheet_1", name: "工作表 1", columns: defaultColumns, data: initialData }
+    ];
+    let activeSheetId = localStorage.getItem('item_tracker_active_sheet') || workbook[0].id;
+
+    function getActiveSheet() {
+      return workbook.find(s => s.id === activeSheetId) || workbook[0];
+    }
+
+    const thead = document.getElementById('table-head');
+    const tbody = document.getElementById('table-body');
+    const sheetsContainer = document.getElementById('sheets-container');
+
+    let draggedColIndex = null;
+    let draggedSheetIndex = null;
+
+    // 切換頁籤 (Tab)
+    window.switchTab = (tabId) => {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+
+      if (tabId === 'gantt-tab') {
+        renderGanttChart();
+      }
+    };
+
+    // 渲染工作表標籤 (Sheets) - 支援拖曳排序
+    function renderSheets() {
+      sheetsContainer.innerHTML = '';
+      workbook.forEach((sheet, index) => {
+        const tab = document.createElement('div');
+        tab.className = `sheet-tab ${sheet.id === activeSheetId ? 'active' : ''}`;
+        tab.setAttribute('draggable', 'true');
+        tab.setAttribute('data-sheet-index', index);
+        
+        tab.innerHTML = `
+          <span class="sheet-name" ondblclick="renameSheet('${sheet.id}')">${sheet.name}</span>
+          ${workbook.length > 1 ? `<span class="sheet-close" onclick="deleteSheet('${sheet.id}', event)">✕</span>` : ''}
+        `;
+
+        // 工作表點擊切換
+        tab.onclick = (e) => {
+          if (e.target.classList.contains('sheet-close')) return;
+          activeSheetId = sheet.id;
+          localStorage.setItem('item_tracker_active_sheet', activeSheetId);
+          renderSheets();
+          renderTable();
+        };
+
+        // 工作表拖曳事件
+        tab.ondragstart = (e) => {
+          draggedSheetIndex = index;
+          e.dataTransfer.effectAllowed = 'move';
+        };
+
+        tab.ondragover = (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          tab.classList.add('drag-over');
+        };
+
+        tab.ondragleave = () => {
+          tab.classList.remove('drag-over');
+        };
+
+        tab.ondrop = (e) => {
+          e.preventDefault();
+          tab.classList.remove('drag-over');
+          const targetIndex = Number(tab.getAttribute('data-sheet-index'));
+
+          if (draggedSheetIndex !== null && draggedSheetIndex !== targetIndex) {
+            const movedSheet = workbook.splice(draggedSheetIndex, 1)[0];
+            workbook.splice(targetIndex, 0, movedSheet);
+
+            saveWorkbook();
+            renderSheets();
+          }
+        };
+
+        sheetsContainer.appendChild(tab);
+      });
+    }
+
+    // 重命名工作表
+    window.renameSheet = (sheetId) => {
+      const sheet = workbook.find(s => s.id === sheetId);
+      const newName = prompt("請輸入新的工作表名稱：", sheet.name);
+      if (newName) {
+        sheet.name = newName.trim();
+        saveWorkbook();
+        renderSheets();
+      }
+    };
+
+    // 新增工作表
+    document.getElementById('add-sheet-btn').onclick = () => {
+      const newId = 'sheet_' + Date.now();
+      const newSheet = {
+        id: newId,
+        name: `工作表 ${workbook.length + 1}`,
+        columns: JSON.parse(JSON.stringify(defaultColumns)),
+        data: []
+      };
+      workbook.push(newSheet);
+      activeSheetId = newId;
+      saveWorkbook();
+      renderSheets();
+      renderTable();
+    };
+
+    // 複製當前工作表
+    document.getElementById('copy-sheet-btn').onclick = () => {
+      const currentSheet = getActiveSheet();
+      const newId = 'sheet_' + Date.now();
+      const copiedSheet = {
+        id: newId,
+        name: `${currentSheet.name} (副本)`,
+        columns: JSON.parse(JSON.stringify(currentSheet.columns)),
+        data: JSON.parse(JSON.stringify(currentSheet.data))
+      };
+      workbook.push(copiedSheet);
+      activeSheetId = newId;
+      saveWorkbook();
+      renderSheets();
+      renderTable();
+    };
+
+    // 刪除工作表
+    window.deleteSheet = (sheetId, event) => {
+      event.stopPropagation();
+      if (workbook.length <= 1) return;
+      if (confirm("確定要刪除此工作表嗎？")) {
+        workbook = workbook.filter(s => s.id !== sheetId);
+        if (activeSheetId === sheetId) {
+          activeSheetId = workbook[0].id;
+        }
+        saveWorkbook();
+        renderSheets();
+        renderTable();
+      }
+    };
+
+    // 渲染表格
+    function renderTable() {
+      const sheet = getActiveSheet();
+
+      // 渲染表頭 (雙擊修改欄位名稱, 拖曳排序)
+      let trHeadHtml = '<tr>';
+      sheet.columns.forEach((col, index) => {
+        trHeadHtml += `
+          <th draggable="true" 
+              data-index="${index}" 
+              ondragstart="handleDragStart(event)" 
+              ondragover="handleDragOver(event)" 
+              ondragleave="handleDragLeave(event)" 
+              ondrop="handleDrop(event)"
+              ondblclick="editColumnLabel(${index})">
+            ${col.label}
+            <span class="del-col-btn" onclick="deleteColumn('${col.key}', event)" title="刪除此欄位">✕</span>
+          </th>`;
+      });
+      trHeadHtml += `<th style="width: 5%; text-align: center;">操作</th></tr>`;
+      thead.innerHTML = trHeadHtml;
+
+      // 渲染內容
+      tbody.innerHTML = '';
+      sheet.data.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        
+        let trBodyHtml = '';
+        sheet.columns.forEach(col => {
+          const val = row[col.key] !== undefined ? row[col.key] : '-';
+          if (col.key === 'progress') {
+            trBodyHtml += `
+              <td class="editable" ondblclick="editCell(${index}, '${col.key}')">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: ${val}%;"></div>
+                  </div>
+                  <span style="font-size: 0.8rem; font-weight: 700;">${val}%</span>
+                </div>
+              </td>`;
+          } else if (col.key === 'status') {
+            let statusClass = 'status-todo';
+            if (val === '已完成' || row.progress == 100) statusClass = 'status-done';
+            else if (val === '進行中') statusClass = 'status-doing';
+            
+            trBodyHtml += `
+              <td class="editable" onclick="changeStatus(${index})">
+                <span class="status-badge ${statusClass}">${val || '未開始'} ▾</span>
+              </td>`;
+          } else if (col.key === 'itemNo') {
+            trBodyHtml += `<td class="editable" style="font-weight: 700; color: var(--accent);" ondblclick="editCell(${index}, '${col.key}')">${val}</td>`;
+          } else {
+            trBodyHtml += `<td class="editable" ondblclick="editCell(${index}, '${col.key}')">${val}</td>`;
+          }
+        });
+
+        trBodyHtml += `
+          <td style="text-align: center;">
+            <button class="action-btn" onclick="deleteRow(${index})" title="刪除項目">🗑️</button>
+          </td>`;
+        tr.innerHTML = trBodyHtml;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 修改狀態 (下拉選單選擇: 未開始, 進行中, 已完成)
+    window.changeStatus = (index) => {
+      const sheet = getActiveSheet();
+      const currentStatus = sheet.data[index].status || '未開始';
+      
+      const options = ["未開始", "進行中", "已完成"];
+      const selected = prompt(`請選擇狀態 (輸入數字或直接輸入名稱):\n1. 未開始\n2. 進行中\n3. 已完成`, currentStatus);
+
+      if (selected !== null) {
+        let newStatus = selected.trim();
+        if (newStatus === "1") newStatus = "未開始";
+        if (newStatus === "2") newStatus = "進行中";
+        if (newStatus === "3") newStatus = "已完成";
+
+        if (options.includes(newStatus)) {
+          sheet.data[index].status = newStatus;
+          if (newStatus === '已完成') {
+            sheet.data[index].progress = 100;
+          } else if (newStatus === '未開始' && sheet.data[index].progress === 100) {
+            sheet.data[index].progress = 0;
+          }
+          saveWorkbook();
+          renderTable();
+        } else {
+          alert("請選擇有效的狀態：未開始、進行中 或 已完成");
+        }
+      }
+    };
+
+    // 雙擊修改欄位名稱
+    window.editColumnLabel = (colIndex) => {
+      const sheet = getActiveSheet();
+      const currentLabel = sheet.columns[colIndex].label;
+      const newLabel = prompt("請修改欄位名稱：", currentLabel);
+      if (newLabel && newLabel.trim() !== "") {
+        sheet.columns[colIndex].label = newLabel.trim();
+        saveWorkbook();
+        renderTable();
+      }
+    };
+
+    // 拖曳欄位邏輯
+    window.handleDragStart = (e) => {
+      draggedColIndex = Number(e.currentTarget.getAttribute('data-index'));
+      e.dataTransfer.effectAllowed = 'move';
+    };
+
+    window.handleDragOver = (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      e.currentTarget.classList.add('drag-over');
+    };
+
+    window.handleDragLeave = (e) => {
+      e.currentTarget.classList.remove('drag-over');
+    };
+
+    window.handleDrop = (e) => {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      const targetIndex = Number(e.currentTarget.getAttribute('data-index'));
+
+      if (draggedColIndex !== null && draggedColIndex !== targetIndex) {
+        const sheet = getActiveSheet();
+        const movedCol = sheet.columns.splice(draggedColIndex, 1)[0];
+        sheet.columns.splice(targetIndex, 0, movedCol);
+
+        saveWorkbook();
+        renderTable();
+      }
+    };
+
+    // 刪除欄位
+    window.deleteColumn = (colKey, event) => {
+      event.stopPropagation();
+      const sheet = getActiveSheet();
+      if (sheet.columns.length <= 1) {
+        alert("至少需保留一個欄位！");
+        return;
+      }
+      if (confirm("確定要刪除此欄位嗎？")) {
+        sheet.columns = sheet.columns.filter(c => c.key !== colKey);
+        saveWorkbook();
+        renderTable();
+      }
+    };
+
+    // 動態生成甘特圖 Engine
+    function renderGanttChart() {
+      const ganttThead = document.getElementById('gantt-thead');
+      const ganttTbody = document.getElementById('gantt-tbody');
+      ganttThead.innerHTML = '';
+      ganttTbody.innerHTML = '';
+
+      const sheet = getActiveSheet();
+      if (sheet.data.length === 0) return;
+
+      const dates = sheet.data.flatMap(d => [new Date(d.startDate), new Date(d.endDate)]).filter(d => !isNaN(d));
+      if (dates.length === 0) return;
+
+      const minDate = new Date(Math.min(...dates));
+      const maxDate = new Date(Math.max(...dates));
+      
+      minDate.setDate(minDate.getDate() - 2);
+      maxDate.setDate(maxDate.getDate() + 5);
+
+      const dayDiff = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
+
+      let headerHtml = `<tr><th style="width: 250px;">品號 / 貨號</th>`;
+      for (let i = 0; i < dayDiff; i++) {
+        const curDate = new Date(minDate);
+        curDate.setDate(curDate.getDate() + i);
+        const dateStr = `${curDate.getMonth() + 1}/${curDate.getDate()}`;
+        headerHtml += `<th class="gantt-header-date">${dateStr}</th>`;
+      }
+      headerHtml += `</tr>`;
+      ganttThead.innerHTML = headerHtml;
+
+      sheet.data.forEach(row => {
+        const tr = document.createElement('tr');
+        let rowHtml = `<td style="font-size: 0.82rem;"><strong>${row.itemNo || '-'}</strong> (${row.sku || '-'})</td>`;
+
+        const start = new Date(row.startDate);
+        const end = new Date(row.endDate);
+
+        const startOffset = Math.max(0, Math.ceil((start - minDate) / (1000 * 60 * 60 * 24)));
+        const duration = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
+
+        for (let i = 0; i < dayDiff; i++) {
+          if (i === startOffset) {
+            rowHtml += `<td class="gantt-cell" colspan="${duration}">
+              <div class="gantt-bar-wrapper" style="width: 95%;">
+                ${row.purchaseNo || ''} - ${row.progress || 0}%
+              </div>
+            </td>`;
+            i += duration - 1;
+          } else {
+            rowHtml += `<td class="gantt-cell"></td>`;
+          }
+        }
+        tr.innerHTML = rowHtml;
+        ganttTbody.appendChild(tr);
+      });
+    }
+
+    // 編輯單元格
+    window.editCell = (index, key) => {
+      const sheet = getActiveSheet();
+      const currentVal = sheet.data[index][key] || '';
+      const newVal = prompt(`請修改內容：`, currentVal);
+
+      if (newVal !== null) {
+        sheet.data[index][key] = key === 'progress' ? Math.min(100, Math.max(0, parseInt(newVal) || 0)) : newVal.trim();
+        saveWorkbook();
+        renderTable();
+      }
+    };
+
+    // 刪除列
+    window.deleteRow = (index) => {
+      const sheet = getActiveSheet();
+      if (confirm(`確定要刪除這筆資料嗎？`)) {
+        sheet.data.splice(index, 1);
+        saveWorkbook();
+        renderTable();
+      }
+    };
+
+    // 新增料號項目
+    document.getElementById('add-row-btn').onclick = () => {
+      const sheet = getActiveSheet();
+      const newItem = {};
+      sheet.columns.forEach(col => {
+        if (col.key === 'startDate' || col.key === 'endDate') {
+          newItem[col.key] = new Date().toISOString().slice(0, 10);
+        } else if (col.key === 'progress') {
+          newItem[col.key] = 0;
+        } else if (col.key === 'status') {
+          newItem[col.key] = "未開始";
+        } else {
+          newItem[col.key] = prompt(`請輸入 ${col.label}：`, "") || "-";
+        }
+      });
+      sheet.data.push(newItem);
+      saveWorkbook();
+      renderTable();
+    };
+
+    // 新增自訂欄位
+    document.getElementById('add-col-btn').onclick = () => {
+      const colLabel = prompt("請輸入新欄位名稱（例如：備註、供應商）：");
+      if (!colLabel) return;
+
+      const sheet = getActiveSheet();
+      const colKey = 'custom_' + Date.now();
+      sheet.columns.push({ key: colKey, label: colLabel, isSystem: false });
+
+      sheet.data.forEach(row => { row[colKey] = "-"; });
+
+      saveWorkbook();
+      renderTable();
+    };
+
+    function saveWorkbook() {
+      localStorage.setItem('item_tracker_workbook', JSON.stringify(workbook));
+      localStorage.setItem('item_tracker_active_sheet', activeSheetId);
+    }
+
+    // 匯出截圖
+    document.getElementById('export-tracker-img-btn').onclick = () => exportImage('tracker-export-area', 'Filament_Outsource_Tracker');
+    document.getElementById('export-gantt-img-btn').onclick = () => exportImage('gantt-export-area', 'Filament_Outsource_Gantt');
+
+    function exportImage(areaId, fileName) {
+      const exportArea = document.getElementById(areaId);
+      html2canvas(exportArea, { backgroundColor: '#1e293b', scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL("image/png");
+        link.download = `${fileName}_${new Date().toISOString().slice(0,10)}.png`;
+        link.click();
+      });
+    }
+
+    renderSheets();
+    renderTable();
+  </script>
+</body>
+</html>
