@@ -350,34 +350,56 @@
   </div>
 
   <script>
-    const img1Items = [
-      "10091-VWNE000", "10021-VWNE000", "14967-VWNE001", "10014-VWTE000",
-      "10207-FWTE000", "10024-VWNE000", "14725-FWNE000", "10247-FWUE000",
-      "10031-FWTE001", "13876-VWNE000", "組合件", "(60039-VTAG100&61533-VWTG100)",
-      "F0024-VWNE000", "14799-FWNE000", "FV80-0433", "FSEC-0004W",
-      "FMTK-0121", "FNIR-0001M", "FAMT-0275", "FV810-5017",
-      "FVSE-0590-3", "FV810-5006-1", "FNI3-0012M", "FV80-0490",
-      "FVSE-1927", "FINT-0053", "FV810-0018N", "FV80-0459",
-      "FVSE-1762", "FVSE-0609-4", "FVSE-0343-2", "18385-FWNE000",
-      "FV810-0018P", "FVVX-77001-1", "FVSE-0143", "10227-FWNE000",
-      "FVSE-1715", "FV810-0206", "14967-FWNE000", "FVSE-1929",
-      "FSEC-0004W-M", "FVSE-0526-1", "10063-FWNE000", "FVSE-1861",
-      "FGSD-8120.", "FVSE-0397-3", "FAIB-1637", "FAPX-0044-2"
-    ];
-
-    const img2Skus = [
-      "FVSE-0036-4", "FVSE-0525-4", "FVSE-0032-4", "FVSE-0068",
-      "FV80-0433", "FVSE-0471-6", "FVEX-3030M", "FV810-0206WU",
-      "FDSI-0029-0036與FVSE-0036-4相同治具", "FVSE-0480-1", "6F001-04712223", "FVVX-69340T",
-      "10207-FWTE000", "10824-SWNE001", "10239-FTAE001", "13722-FWNE000",
-      "10020-AWTE000", "10014-FWTE000", "15299-VWNE000", "10063-FWUE000",
-      "13967-FWNE000", "10021-FWTE000", "18366-VWTE000", "13876-FWNE000",
-      "10226-FWNE000", "10024-FWNE000", "16809-VWNE000", "18385-VWNE000",
-      "10187-VWNE000", "18385-FWNE000", "10226-FWTE001", "10134-FWTE000",
-      "10134-VWTE000", "10227-FWNE000", "13909-VWTE000", "10247-FWTE000",
-      "14967-FWNE000", "18375-VWNE000", "10824-SWTE000", "10227-VWNE000",
-      "10063-FWNE000", "17568-VWNE000", "10206-FWNE000", "10207-VWTE000",
-      "12111-BWTE000"
+    // 依據對照圖片進行修正的資料陣列
+    const imgData = [
+      { sku: "FVSE-0036-4", itemNo: "10091-VWNE000", purchaseNo: "50001-111" },
+      { sku: "FVSE-0525-4", itemNo: "10021-VWNE000", purchaseNo: "50001-112" },
+      { sku: "FVSE-0032-4", itemNo: "14967-VWNE001", purchaseNo: "50001-113" },
+      { sku: "FVSE-0068", itemNo: "10014-VWTE000", purchaseNo: "50001-114" },
+      { sku: "FV80-0433", itemNo: "10207-FWTE000", purchaseNo: "50001-115" },
+      { sku: "FVSE-0471-6", itemNo: "10024-VWNE000", purchaseNo: "50001-116" },
+      { sku: "FVEX-3030M", itemNo: "14725-FWNE000", purchaseNo: "50001-117" },
+      { sku: "FV810-0206WU", itemNo: "10247-FWUE000", purchaseNo: "50001-118" },
+      { sku: "FDSI-0029-0036 與FVSE-0036-4相同治具", itemNo: "10031-FWTE001", purchaseNo: "50001-119" },
+      { sku: "FVSE-0480-1", itemNo: "13876-VWNE000", purchaseNo: "50001-120" },
+      { sku: "FVSE-0480-1", itemNo: "組合件", purchaseNo: "50001-121" },
+      { sku: "FVSE-0480-1", itemNo: "(60039-VTAG100&61533-VWTG100)", purchaseNo: "50001-122" },
+      { sku: "6F001-04712223", itemNo: "F0024-VWNE000", purchaseNo: "50001-123" },
+      { sku: "FVVX-69340T", itemNo: "14799-FWNE000", purchaseNo: "50001-124" },
+      { sku: "10207-FWTE000", itemNo: "FV80-0433", purchaseNo: "50001-125" },
+      { sku: "10824-SWNE001", itemNo: "FSEC-0004W", purchaseNo: "50001-126" },
+      { sku: "10239-FTAE001", itemNo: "FMTK-0121", purchaseNo: "50001-127" },
+      { sku: "13722-FWNE000", itemNo: "FNIR-0001M", purchaseNo: "50001-128" },
+      { sku: "10020-AWTE000", itemNo: "FAMT-0275", purchaseNo: "50001-129" },
+      { sku: "10014-FWTE000", itemNo: "FV810-5017", purchaseNo: "50001-130" },
+      { sku: "15299-VWNE000", itemNo: "FVSE-0590-3", purchaseNo: "50001-131" },
+      { sku: "10063-FWUE000", itemNo: "FV810-5006-1", purchaseNo: "50001-132" },
+      { sku: "13967-FWNE000", itemNo: "FNI3-0012M", purchaseNo: "50001-133" },
+      { sku: "10021-FWTE000", itemNo: "FV80-0490", purchaseNo: "50001-134" },
+      { sku: "18366-VWTE000", itemNo: "FVSE-1927", purchaseNo: "50001-135" },
+      { sku: "13876-FWNE000", itemNo: "FINT-0053", purchaseNo: "50001-136" },
+      { sku: "10226-FWNE000", itemNo: "FV810-0018N", purchaseNo: "50001-137" },
+      { sku: "10024-FWNE000", itemNo: "FV80-0459", purchaseNo: "50001-138" },
+      { sku: "16809-VWNE000", itemNo: "FVSE-1762", purchaseNo: "50001-139" },
+      { sku: "18385-VWNE000", itemNo: "FVSE-0609-4", purchaseNo: "50001-140" },
+      { sku: "10187-VWNE000", itemNo: "FVSE-0343-2", purchaseNo: "50001-141" },
+      { sku: "18385-FWNE000", itemNo: "18385-FWNE000", purchaseNo: "50001-142" },
+      { sku: "10226-FWTE001", itemNo: "FV810-0018P", purchaseNo: "50001-143" },
+      { sku: "10134-FWTE000", itemNo: "FVVX-77001-1", purchaseNo: "50001-144" },
+      { sku: "10134-VWTE000", itemNo: "FVSE-0143", purchaseNo: "50001-145" },
+      { sku: "10227-FWNE000", itemNo: "10227-FWNE000", purchaseNo: "50001-146" },
+      { sku: "13909-VWTE000", itemNo: "FVSE-1715", purchaseNo: "50001-147" },
+      { sku: "10247-FWTE000", itemNo: "FV810-0206", purchaseNo: "50001-148" },
+      { sku: "14967-FWNE000", itemNo: "14967-FWNE000", purchaseNo: "50001-149" },
+      { sku: "18375-VWNE000", itemNo: "FVSE-1929", purchaseNo: "50001-150" },
+      { sku: "10824-SWTE000", itemNo: "FSEC-0004W-M", purchaseNo: "50001-151" },
+      { sku: "10227-VWNE000", itemNo: "FVSE-0526-1", purchaseNo: "50001-152" },
+      { sku: "10063-FWNE000", itemNo: "10063-FWNE000", purchaseNo: "50001-153" },
+      { sku: "17568-VWNE000", itemNo: "FVSE-1861", purchaseNo: "50001-154" },
+      { sku: "10206-FWNE000", itemNo: "FGSD-8120.", purchaseNo: "50001-155" },
+      { sku: "10207-VWTE000", itemNo: "FVSE-0397-3", purchaseNo: "50001-156" },
+      { sku: "12111-BWTE000", itemNo: "FAIB-1637", purchaseNo: "50001-157" },
+      { sku: "12111-BWTE000", itemNo: "FAPX-0044-2", purchaseNo: "50001-158" }
     ];
 
     const defaultColumns = [
@@ -390,19 +412,15 @@
       { key: "status", label: "狀態", isSystem: false }
     ];
 
-    const maxLen = Math.max(img1Items.length, img2Skus.length);
-    const initialData = [];
-    for (let i = 0; i < maxLen; i++) {
-      initialData.push({
-        itemNo: img1Items[i] || "-",
-        sku: img2Skus[i] || "-",
-        purchaseNo: `PO-2026-${String(i + 1).padStart(3, '0')}`,
-        startDate: "2026-03-01",
-        endDate: "2026-03-15",
-        progress: 0,
-        status: "未開始"
-      });
-    }
+    const initialData = imgData.map(item => ({
+      itemNo: item.itemNo,
+      sku: item.sku,
+      purchaseNo: item.purchaseNo,
+      startDate: "2026-03-01",
+      endDate: "2026-03-15",
+      progress: 0,
+      status: "未開始"
+    }));
 
     // 工作表資料結構 (Workbook Management)
     let workbook = JSON.parse(localStorage.getItem('item_tracker_workbook')) || [
