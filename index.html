@@ -426,7 +426,7 @@
     let workbook = JSON.parse(localStorage.getItem('outsource_filament_workbook')) || [
       { id: "sheet_1", name: "工作表 1", columns: defaultColumns, data: initialData }
     ];
-    let activeSheetId = localStorage.getItem('item_tracker_active_sheet') || workbook[0].id;
+    let activeSheetId = localStorage.getItem('outsource_filament_active_sheet') || workbook[0].id;
 
     function getActiveSheet() {
       return workbook.find(s => s.id === activeSheetId) || workbook[0];
@@ -470,7 +470,7 @@
         tab.onclick = (e) => {
           if (e.target.classList.contains('sheet-close')) return;
           activeSheetId = sheet.id;
-          localStorage.setItem('item_tracker_active_sheet', activeSheetId);
+          localStorage.setItem('outsource_filament_active_sheet', activeSheetId);
           renderSheets();
           renderTable();
         };
@@ -838,7 +838,7 @@
 
     function saveWorkbook() {
       localStorage.setItem('outsource_filament_workbook', JSON.stringify(workbook));
-      localStorage.setItem('item_tracker_active_sheet', activeSheetId);
+      localStorage.setItem('outsource_filament_active_sheet', activeSheetId);
     }
 
     // 匯出截圖
