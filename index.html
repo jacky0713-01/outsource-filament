@@ -64,6 +64,11 @@
       border: 1px solid var(--border-color);
       padding: 6px;
       cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .brand-logo:hover {
+      border-color: var(--accent);
     }
 
     .badge-pro {
@@ -324,7 +329,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // 帶入您的 Firebase Config 金鑰
     const firebaseConfig = {
       apiKey: "AIzaSyDrRzvbrpq87mDlHE8vpoAfWxwNS5aOV2E",
       authDomain: "outsourcefilament.firebaseapp.com",
@@ -338,7 +342,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dbRef = ref(db, 'outsource_filament_workbook');
+    const dbRef = ref(db, 'outsource_filament_app');
 
     const defaultColumns = [
       { key: "itemNo", label: "品號", isSystem: false },
@@ -355,50 +359,7 @@
       { sku: "FVSE-0525-4", itemNo: "10021-VWNE000", purchaseNo: "50001-112" },
       { sku: "FVSE-0032-4", itemNo: "14967-VWNE001", purchaseNo: "50001-113" },
       { sku: "FVSE-0068", itemNo: "10014-VWTE000", purchaseNo: "50001-114" },
-      { sku: "FV80-0433", itemNo: "10207-FWTE000", purchaseNo: "50001-115" },
-      { sku: "FVSE-0471-6", itemNo: "10024-VWNE000", purchaseNo: "50001-116" },
-      { sku: "FVEX-3030M", itemNo: "14725-FWNE000", purchaseNo: "50001-117" },
-      { sku: "FV810-0206WU", itemNo: "10247-FWUE000", purchaseNo: "50001-118" },
-      { sku: "FDSI-0029-0036 與FVSE-0036-4相同治具", itemNo: "10031-FWTE001", purchaseNo: "50001-119" },
-      { sku: "FVSE-0480-1", itemNo: "13876-VWNE000", purchaseNo: "50001-120" },
-      { sku: "FVSE-0480-1", itemNo: "組合件", purchaseNo: "50001-121" },
-      { sku: "FVSE-0480-1", itemNo: "(60039-VTAG100&61533-VWTG100)", purchaseNo: "50001-122" },
-      { sku: "6F001-04712223", itemNo: "F0024-VWNE000", purchaseNo: "50001-123" },
-      { sku: "FVVX-69340T", itemNo: "14799-FWNE000", purchaseNo: "50001-124" },
-      { sku: "10207-FWTE000", itemNo: "FV80-0433", purchaseNo: "50001-125" },
-      { sku: "10824-SWNE001", itemNo: "FSEC-0004W", purchaseNo: "50001-126" },
-      { sku: "10239-FTAE001", itemNo: "FMTK-0121", purchaseNo: "50001-127" },
-      { sku: "13722-FWNE000", itemNo: "FNIR-0001M", purchaseNo: "50001-128" },
-      { sku: "10020-AWTE000", itemNo: "FAMT-0275", purchaseNo: "50001-129" },
-      { sku: "10014-FWTE000", itemNo: "FV810-5017", purchaseNo: "50001-130" },
-      { sku: "15299-VWNE000", itemNo: "FVSE-0590-3", purchaseNo: "50001-131" },
-      { sku: "10063-FWUE000", itemNo: "FV810-5006-1", purchaseNo: "50001-132" },
-      { sku: "13967-FWNE000", itemNo: "FNI3-0012M", purchaseNo: "50001-133" },
-      { sku: "10021-FWTE000", itemNo: "FV80-0490", purchaseNo: "50001-134" },
-      { sku: "18366-VWTE000", itemNo: "FVSE-1927", purchaseNo: "50001-135" },
-      { sku: "13876-FWNE000", itemNo: "FINT-0053", purchaseNo: "50001-136" },
-      { sku: "10226-FWNE000", itemNo: "FV810-0018N", purchaseNo: "50001-137" },
-      { sku: "10024-FWNE000", itemNo: "FV80-0459", purchaseNo: "50001-138" },
-      { sku: "16809-VWNE000", itemNo: "FVSE-1762", purchaseNo: "50001-139" },
-      { sku: "18385-VWNE000", itemNo: "FVSE-0609-4", purchaseNo: "50001-140" },
-      { sku: "10187-VWNE000", itemNo: "FVSE-0343-2", purchaseNo: "50001-141" },
-      { sku: "18385-FWNE000", itemNo: "18385-FWNE000", purchaseNo: "50001-142" },
-      { sku: "10226-FWTE001", itemNo: "FV810-0018P", purchaseNo: "50001-143" },
-      { sku: "10134-FWTE000", itemNo: "FVVX-77001-1", purchaseNo: "50001-144" },
-      { sku: "10134-VWTE000", itemNo: "FVSE-0143", purchaseNo: "50001-145" },
-      { sku: "10227-FWNE000", itemNo: "10227-FWNE000", purchaseNo: "50001-146" },
-      { sku: "13909-VWTE000", itemNo: "FVSE-1715", purchaseNo: "50001-147" },
-      { sku: "10247-FWTE000", itemNo: "FV810-0206", purchaseNo: "50001-148" },
-      { sku: "14967-FWNE000", itemNo: "14967-FWNE000", purchaseNo: "50001-149" },
-      { sku: "18375-VWNE000", itemNo: "FVSE-1929", purchaseNo: "50001-150" },
-      { sku: "10824-SWTE000", itemNo: "FSEC-0004W-M", purchaseNo: "50001-151" },
-      { sku: "10227-VWNE000", itemNo: "FVSE-0526-1", purchaseNo: "50001-152" },
-      { sku: "10063-FWNE000", itemNo: "10063-FWNE000", purchaseNo: "50001-153" },
-      { sku: "17568-VWNE000", itemNo: "FVSE-1861", purchaseNo: "50001-154" },
-      { sku: "10206-FWNE000", itemNo: "FGSD-8120.", purchaseNo: "50001-155" },
-      { sku: "10207-VWTE000", itemNo: "FVSE-0397-3", purchaseNo: "50001-156" },
-      { sku: "12111-BWTE000", itemNo: "FAIB-1637", purchaseNo: "50001-157" },
-      { sku: "12111-BWTE000", itemNo: "FAPX-0044-2", purchaseNo: "50001-158" }
+      { sku: "FV80-0433", itemNo: "10207-FWTE000", purchaseNo: "50001-115" }
     ];
 
     const initialData = imgData.map(item => ({
@@ -411,42 +372,66 @@
       status: "未開始"
     }));
 
-    let workbook = [
-      { id: "sheet_1", name: "工程及製造追蹤項目", columns: defaultColumns, data: initialData },
-      { id: "sheet_2", name: "採購追蹤項目", columns: defaultColumns, data: [] },
-      { id: "sheet_3", name: "品保追蹤項目", columns: defaultColumns, data: [] }
-    ];
+    const defaultLogo = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/></svg>";
+
+    let appState = {
+      logoUrl: defaultLogo,
+      workbook: [
+        { id: "sheet_1", name: "工程及製造追蹤項目", columns: defaultColumns, data: initialData },
+        { id: "sheet_2", name: "採購追蹤項目", columns: defaultColumns, data: [] },
+        { id: "sheet_3", name: "品保追蹤項目", columns: defaultColumns, data: [] }
+      ]
+    };
 
     let activeSheetId = "sheet_1";
+    const logoEl = document.getElementById('app-logo');
 
-    const thead = document.getElementById('table-head');
-    const tbody = document.getElementById('table-body');
-    const sheetsContainer = document.getElementById('sheets-container');
+    // 💡 點擊 Logo 輸入新圖片網址
+    logoEl.ondblclick = () => {
+      const newUrl = prompt("請輸入新 Logo 圖片的 URL 網址：", logoEl.src);
+      if (newUrl && newUrl.trim() !== "") {
+        appState.logoUrl = newUrl.trim();
+        saveData();
+      }
+    };
 
-    let draggedColIndex = null;
-    let draggedSheetIndex = null;
-
-    // 監聽雲端即時變更
+    // 監聽雲端資料
     onValue(dbRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        workbook = data;
-        if (!workbook.find(s => s.id === activeSheetId)) {
-          activeSheetId = workbook[0].id;
+        appState = data;
+        if (!appState.logoUrl) appState.logoUrl = defaultLogo;
+        if (!appState.workbook.find(s => s.id === activeSheetId)) {
+          activeSheetId = appState.workbook[0].id;
         }
       } else {
-        saveWorkbook();
+        saveData();
       }
-      renderSheets();
-      renderTable();
+      renderApp();
+    }, (error) => {
+      console.warn("雲端讀取失敗，改用 LocalStorage：", error);
+      const local = localStorage.getItem('filament_app_data');
+      if (local) appState = JSON.parse(local);
+      renderApp();
     });
 
-    function saveWorkbook() {
-      set(dbRef, workbook);
+    function saveData() {
+      // 同步儲存至 Firebase 與 LocalStorage
+      set(dbRef, appState).catch(err => {
+        console.error("Firebase 寫入權限受限，僅儲存在本機", err);
+      });
+      localStorage.setItem('filament_app_data', JSON.stringify(appState));
+      renderApp();
+    }
+
+    function renderApp() {
+      logoEl.src = appState.logoUrl || defaultLogo;
+      renderSheets();
+      renderTable();
     }
 
     function getActiveSheet() {
-      return workbook.find(s => s.id === activeSheetId) || workbook[0];
+      return appState.workbook.find(s => s.id === activeSheetId) || appState.workbook[0];
     }
 
     window.switchTab = (tabId) => {
@@ -457,20 +442,17 @@
     };
 
     function renderSheets() {
+      const sheetsContainer = document.getElementById('sheets-container');
       sheetsContainer.innerHTML = '';
-      workbook.forEach((sheet, index) => {
+      appState.workbook.forEach((sheet, index) => {
         const tab = document.createElement('div');
         tab.className = `sheet-tab ${sheet.id === activeSheetId ? 'active' : ''}`;
-        tab.setAttribute('draggable', 'true');
-        tab.setAttribute('data-sheet-index', index);
-        
         tab.innerHTML = `
           <span class="sheet-name">${sheet.name}</span>
-          ${workbook.length > 1 ? `<span class="sheet-close">✕</span>` : ''}
+          ${appState.workbook.length > 1 ? `<span class="sheet-close">✕</span>` : ''}
         `;
 
-        const nameSpan = tab.querySelector('.sheet-name');
-        nameSpan.ondblclick = () => renameSheet(sheet.id);
+        tab.querySelector('.sheet-name').ondblclick = () => renameSheet(sheet.id);
 
         const closeSpan = tab.querySelector('.sheet-close');
         if (closeSpan) {
@@ -480,33 +462,7 @@
         tab.onclick = (e) => {
           if (e.target.classList.contains('sheet-close')) return;
           activeSheetId = sheet.id;
-          renderSheets();
-          renderTable();
-        };
-
-        tab.ondragstart = (e) => {
-          draggedSheetIndex = index;
-          e.dataTransfer.effectAllowed = 'move';
-        };
-
-        tab.ondragover = (e) => {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = 'move';
-          tab.classList.add('drag-over');
-        };
-
-        tab.ondragleave = () => tab.classList.remove('drag-over');
-
-        tab.ondrop = (e) => {
-          e.preventDefault();
-          tab.classList.remove('drag-over');
-          const targetIndex = Number(tab.getAttribute('data-sheet-index'));
-
-          if (draggedSheetIndex !== null && draggedSheetIndex !== targetIndex) {
-            const movedSheet = workbook.splice(draggedSheetIndex, 1)[0];
-            workbook.splice(targetIndex, 0, movedSheet);
-            saveWorkbook();
-          }
+          renderApp();
         };
 
         sheetsContainer.appendChild(tab);
@@ -514,46 +470,46 @@
     }
 
     function renameSheet(sheetId) {
-      const sheet = workbook.find(s => s.id === sheetId);
+      const sheet = appState.workbook.find(s => s.id === sheetId);
       const newName = prompt("請輸入新的工作表名稱：", sheet.name);
       if (newName) {
         sheet.name = newName.trim();
-        saveWorkbook();
+        saveData();
       }
     }
 
     document.getElementById('add-sheet-btn').onclick = () => {
       const newId = 'sheet_' + Date.now();
-      workbook.push({
+      appState.workbook.push({
         id: newId,
-        name: `工作表 ${workbook.length + 1}`,
+        name: `工作表 ${appState.workbook.length + 1}`,
         columns: JSON.parse(JSON.stringify(defaultColumns)),
         data: []
       });
       activeSheetId = newId;
-      saveWorkbook();
+      saveData();
     };
 
     document.getElementById('copy-sheet-btn').onclick = () => {
       const currentSheet = getActiveSheet();
       const newId = 'sheet_' + Date.now();
-      workbook.push({
+      appState.workbook.push({
         id: newId,
         name: `${currentSheet.name} (副本)`,
         columns: JSON.parse(JSON.stringify(currentSheet.columns)),
         data: JSON.parse(JSON.stringify(currentSheet.data || []))
       });
       activeSheetId = newId;
-      saveWorkbook();
+      saveData();
     };
 
     function deleteSheet(sheetId, event) {
       event.stopPropagation();
-      if (workbook.length <= 1) return;
+      if (appState.workbook.length <= 1) return;
       if (confirm("確定要刪除此工作表嗎？")) {
-        workbook = workbook.filter(s => s.id !== sheetId);
-        if (activeSheetId === sheetId) activeSheetId = workbook[0].id;
-        saveWorkbook();
+        appState.workbook = appState.workbook.filter(s => s.id !== sheetId);
+        if (activeSheetId === sheetId) activeSheetId = appState.workbook[0].id;
+        saveData();
       }
     }
 
@@ -561,39 +517,32 @@
       const sheet = getActiveSheet();
       if (!sheet.data) sheet.data = [];
 
+      const thead = document.getElementById('table-head');
+      const tbody = document.getElementById('table-body');
+
       let trHeadHtml = '<tr>';
       sheet.columns.forEach((col, index) => {
         trHeadHtml += `
-          <th draggable="true" 
-              data-index="${index}" 
-              class="th-col">
+          <th class="th-col" data-index="${index}">
             ${col.label}
-            <span class="del-col-btn" title="刪除此欄位">✕</span>
+            <span class="del-col-btn" title="刪除欄位">✕</span>
           </th>`;
       });
       trHeadHtml += `<th style="width: 5%; text-align: center;">操作</th></tr>`;
       thead.innerHTML = trHeadHtml;
 
-      const ths = thead.querySelectorAll('.th-col');
-      ths.forEach(th => {
+      thead.querySelectorAll('.th-col').forEach(th => {
         const index = Number(th.getAttribute('data-index'));
         th.ondblclick = () => editColumnLabel(index);
-        th.ondragstart = (e) => handleDragStart(e, index);
-        th.ondragover = handleDragOver;
-        th.ondragleave = handleDragLeave;
-        th.ondrop = (e) => handleDrop(e, index);
-
         const delBtn = th.querySelector('.del-col-btn');
-        if (delBtn) {
-          delBtn.onclick = (e) => deleteColumn(sheet.columns[index].key, e);
-        }
+        if (delBtn) delBtn.onclick = (e) => deleteColumn(sheet.columns[index].key, e);
       });
 
       tbody.innerHTML = '';
       sheet.data.forEach((row, index) => {
         const tr = document.createElement('tr');
-        
         let trBodyHtml = '';
+        
         sheet.columns.forEach(col => {
           const val = row[col.key] !== undefined ? row[col.key] : '-';
           if (col.key === 'progress') {
@@ -615,8 +564,6 @@
               <td class="editable cell-status">
                 <span class="status-badge ${statusClass}">${val || '未開始'} ▾</span>
               </td>`;
-          } else if (col.key === 'itemNo') {
-            trBodyHtml += `<td class="editable cell-edit" data-key="${col.key}" style="font-weight: 700; color: var(--accent);">${val}</td>`;
           } else {
             trBodyHtml += `<td class="editable cell-edit" data-key="${col.key}">${val}</td>`;
           }
@@ -643,62 +590,13 @@
       });
     }
 
-    function changeStatus(index) {
-      const sheet = getActiveSheet();
-      const currentStatus = sheet.data[index].status || '未開始';
-      const options = ["未開始", "進行中", "已完成"];
-      const selected = prompt(`請選擇狀態 (輸入數字或直接輸入名稱):\n1. 未開始\n2. 進行中\n3. 已完成`, currentStatus);
-
-      if (selected !== null) {
-        let newStatus = selected.trim();
-        if (newStatus === "1") newStatus = "未開始";
-        if (newStatus === "2") newStatus = "進行中";
-        if (newStatus === "3") newStatus = "已完成";
-
-        if (options.includes(newStatus)) {
-          sheet.data[index].status = newStatus;
-          if (newStatus === '已完成') sheet.data[index].progress = 100;
-          else if (newStatus === '未開始' && sheet.data[index].progress === 100) sheet.data[index].progress = 0;
-          saveWorkbook();
-        } else {
-          alert("請選擇有效的狀態：未開始、進行中 或 已完成");
-        }
-      }
-    }
-
     function editColumnLabel(colIndex) {
       const sheet = getActiveSheet();
       const currentLabel = sheet.columns[colIndex].label;
       const newLabel = prompt("請修改欄位名稱：", currentLabel);
       if (newLabel && newLabel.trim() !== "") {
         sheet.columns[colIndex].label = newLabel.trim();
-        saveWorkbook();
-      }
-    }
-
-    function handleDragStart(e, index) {
-      draggedColIndex = index;
-      e.dataTransfer.effectAllowed = 'move';
-    }
-
-    function handleDragOver(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      e.currentTarget.classList.add('drag-over');
-    }
-
-    function handleDragLeave(e) {
-      e.currentTarget.classList.remove('drag-over');
-    }
-
-    function handleDrop(e, targetIndex) {
-      e.preventDefault();
-      e.currentTarget.classList.remove('drag-over');
-      if (draggedColIndex !== null && draggedColIndex !== targetIndex) {
-        const sheet = getActiveSheet();
-        const movedCol = sheet.columns.splice(draggedColIndex, 1)[0];
-        sheet.columns.splice(targetIndex, 0, movedCol);
-        saveWorkbook();
+        saveData();
       }
     }
 
@@ -711,7 +609,7 @@
       }
       if (confirm("確定要刪除此欄位嗎？")) {
         sheet.columns = sheet.columns.filter(c => c.key !== colKey);
-        saveWorkbook();
+        saveData();
       }
     }
 
@@ -722,7 +620,26 @@
 
       if (newVal !== null) {
         sheet.data[index][key] = key === 'progress' ? Math.min(100, Math.max(0, parseInt(newVal) || 0)) : newVal.trim();
-        saveWorkbook();
+        saveData();
+      }
+    }
+
+    function changeStatus(index) {
+      const sheet = getActiveSheet();
+      const currentStatus = sheet.data[index].status || '未開始';
+      const selected = prompt(`請選擇狀態 (輸入數字):\n1. 未開始\n2. 進行中\n3. 已完成`, currentStatus);
+
+      if (selected !== null) {
+        let newStatus = selected.trim();
+        if (newStatus === "1") newStatus = "未開始";
+        if (newStatus === "2") newStatus = "進行中";
+        if (newStatus === "3") newStatus = "已完成";
+
+        if (["未開始", "進行中", "已完成"].includes(newStatus)) {
+          sheet.data[index].status = newStatus;
+          if (newStatus === '已完成') sheet.data[index].progress = 100;
+          saveData();
+        }
       }
     }
 
@@ -730,7 +647,7 @@
       const sheet = getActiveSheet();
       if (confirm(`確定要刪除這筆資料嗎？`)) {
         sheet.data.splice(index, 1);
-        saveWorkbook();
+        saveData();
       }
     }
 
@@ -739,22 +656,14 @@
       if (!sheet.data) sheet.data = [];
       const newItem = {};
       sheet.columns.forEach(col => {
-        if (col.key === 'startDate' || col.key === 'endDate') {
-          newItem[col.key] = new Date().toISOString().slice(0, 10);
-        } else if (col.key === 'progress') {
-          newItem[col.key] = 0;
-        } else if (col.key === 'status') {
-          newItem[col.key] = "未開始";
-        } else {
-          newItem[col.key] = "-";
-        }
+        newItem[col.key] = col.key === 'progress' ? 0 : col.key === 'status' ? "未開始" : "-";
       });
       sheet.data.push(newItem);
-      saveWorkbook();
+      saveData();
     };
 
     document.getElementById('add-col-btn').onclick = () => {
-      const colLabel = prompt("請輸入新欄位名稱（例如：備註、供應商）：");
+      const colLabel = prompt("請輸入新欄位名稱：");
       if (!colLabel) return;
 
       const sheet = getActiveSheet();
@@ -765,7 +674,7 @@
         sheet.data.forEach(row => { row[colKey] = "-"; });
       }
 
-      saveWorkbook();
+      saveData();
     };
   </script>
 </body>
