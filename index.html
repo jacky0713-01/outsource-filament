@@ -24,7 +24,7 @@
       height: 100%;
       margin: 0;
       padding: 0;
-      overflow: hidden;
+      overflow: hidden; /* 徹底關閉視窗層級的滾動條 */
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-main);
@@ -35,8 +35,10 @@
       flex-direction: column;
       height: 100vh;
       padding: 16px 24px;
+      box-sizing: border-box;
     }
 
+    /* 頂部固定區（Logo、標題） */
     header {
       display: flex;
       justify-content: space-between;
@@ -45,6 +47,7 @@
       flex-shrink: 0;
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 12px;
+      background-color: var(--bg-color);
     }
 
     .brand-title {
@@ -53,7 +56,6 @@
       gap: 16px;
     }
 
-    /* 圖片容器 (可自由更換圖片) */
     .brand-logo {
       width: 64px;
       height: 64px;
@@ -75,7 +77,6 @@
       letter-spacing: 0.05em;
     }
 
-    /* 字體放大兩倍 (1.4rem -> 2.8rem) */
     h1 {
       margin: 0;
       font-size: 2.8rem;
@@ -84,6 +85,7 @@
       line-height: 1.1;
     }
 
+    /* 固定頁籤列 */
     .nav-tabs {
       display: flex;
       gap: 8px;
@@ -110,7 +112,7 @@
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
     }
 
-    /* Excel 工作表 (Sheet) 列樣式 */
+    /* 固定工作表頁籤 */
     .sheet-bar {
       display: flex;
       align-items: center;
@@ -121,6 +123,7 @@
       border: 1px solid var(--border-color);
       border-bottom: none;
       overflow-x: auto;
+      flex-shrink: 0;
     }
 
     .sheet-tab {
@@ -138,9 +141,7 @@
       user-select: none;
     }
 
-    .sheet-tab:active {
-      cursor: grabbing;
-    }
+    .sheet-tab:active { cursor: grabbing; }
 
     .sheet-tab.active {
       background: #0284c7;
@@ -163,10 +164,27 @@
       color: #f87171;
     }
 
+    /* 主要容器 */
+    .tab-content {
+      display: none;
+      flex: 1;
+      min-height: 0; /* 關鍵：防止內容把外層 Flex 撐開 */
+      background-color: var(--card-bg);
+      border-radius: 0 0 10px 10px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .tab-content.active { display: flex; flex-direction: column; }
+
+    /* 固定按鈕工具列 */
     .toolbar {
       display: flex;
       gap: 12px;
-      margin-bottom: 12px;
+      padding: 12px 16px;
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
       flex-wrap: wrap;
       align-items: center;
       flex-shrink: 0;
@@ -192,17 +210,13 @@
     .btn-primary { background-color: #0284c7; color: #fff; border: none; }
     .btn-primary:hover { background-color: #0369a1; color: #fff; }
 
-    .tab-content {
-      display: none;
+    /* 唯一可滾動區域 */
+    .table-scroll-container {
       flex: 1;
+      min-height: 0; /* 關鍵：強制產生內部垂直滾動 */
       overflow: auto;
-      background-color: var(--card-bg);
-      border-radius: 0 0 10px 10px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      padding: 0 16px 12px 16px;
     }
-
-    .tab-content.active { display: block; }
 
     table {
       width: 100%;
@@ -210,8 +224,9 @@
       text-align: left;
     }
 
+    /* 凍結表格標頭 (th) */
     th {
-      background-color: #0f172a;
+      background-color: #0f172a; /* 不透明底色，遮擋捲動資料 */
       color: #94a3b8;
       font-weight: 700;
       font-size: 0.85rem;
@@ -219,8 +234,8 @@
       letter-spacing: 0.05em;
       padding: 12px 16px;
       border-bottom: 2px solid var(--border-color);
-      position: sticky;
-      top: 0;
+      position: sticky; /* 凍結窗格效果 */
+      top: 0;            /* 固定在表格區域頂端 */
       z-index: 10;
       user-select: none;
     }
@@ -310,12 +325,11 @@
     </div>
 
     <div id="tracker-tab" class="tab-content active">
-      <div class="toolbar" style="padding: 12px 16px 0 16px;">
-        <!-- 按鈕文字更名為「新增列」 -->
+      <div class="toolbar">
         <button id="add-row-btn" class="btn btn-primary">新增列</button>
         <button id="add-col-btn" class="btn btn-primary">新增自訂欄位</button>
       </div>
-      <div id="tracker-export-area" style="padding: 12px 16px;">
+      <div class="table-scroll-container">
         <table>
           <thead id="table-head"></thead>
           <tbody id="table-body"></tbody>
@@ -398,7 +412,9 @@
     }));
 
     let workbook = JSON.parse(localStorage.getItem('outsource_filament_workbook')) || [
-      { id: "sheet_1", name: "工作表 1", columns: defaultColumns, data: initialData }
+      { id: "sheet_1", name: "工程及製造追蹤項目", columns: defaultColumns, data: initialData },
+      { id: "sheet_2", name: "採購追蹤項目", columns: defaultColumns, data: [] },
+      { id: "sheet_3", name: "品保追蹤項目", columns: defaultColumns, data: [] }
     ];
     let activeSheetId = localStorage.getItem('outsource_filament_active_sheet') || workbook[0].id;
 
@@ -706,7 +722,6 @@
       }
     };
 
-    // 改為「新增列」：點擊後直接建立預設空白列，不需彈窗輸入
     document.getElementById('add-row-btn').onclick = () => {
       const sheet = getActiveSheet();
       const newItem = {};
