@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Filament Outsource Tracing</title>
-  <!-- 引入 html2canvas 支援一鍵截圖匯出圖片 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
       --bg-color: #0b1329;
@@ -52,7 +50,19 @@
     .brand-title {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
+    }
+
+    /* 圖片容器 (可自由更換圖片) */
+    .brand-logo {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      border-radius: 8px;
+      background-color: #0f172a;
+      border: 1px solid var(--border-color);
+      padding: 6px;
+      cursor: pointer;
     }
 
     .badge-pro {
@@ -65,11 +75,13 @@
       letter-spacing: 0.05em;
     }
 
+    /* 字體放大兩倍 (1.4rem -> 2.8rem) */
     h1 {
       margin: 0;
-      font-size: 1.4rem;
+      font-size: 2.8rem;
       font-weight: 700;
       color: var(--accent);
+      line-height: 1.1;
     }
 
     .nav-tabs {
@@ -117,9 +129,9 @@
       gap: 6px;
       background: var(--card-bg);
       color: var(--text-muted);
-      padding: 4px 12px;
+      padding: 6px 14px;
       border-radius: 6px;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: grab;
       border: 1px solid var(--border-color);
@@ -179,8 +191,6 @@
 
     .btn-primary { background-color: #0284c7; color: #fff; border: none; }
     .btn-primary:hover { background-color: #0369a1; color: #fff; }
-    .btn-success { background-color: #10b981; color: #fff; border: none; }
-    .btn-success:hover { background-color: #059669; color: #fff; }
 
     .tab-content {
       display: none;
@@ -266,26 +276,6 @@
     .status-doing { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid var(--accent); }
     .status-todo { background: rgba(251, 191, 36, 0.15); color: var(--warning); border: 1px solid var(--warning); }
 
-    .gantt-table { table-layout: fixed; min-width: 1000px; }
-    .gantt-header-date { text-align: center; font-size: 0.75rem; border-left: 1px solid var(--border-color); }
-    .gantt-cell { position: relative; height: 36px; padding: 0 !important; border-left: 1px solid rgba(255, 255, 255, 0.05); }
-    .gantt-bar-wrapper {
-      position: absolute;
-      top: 6px;
-      height: 24px;
-      background: rgba(56, 189, 248, 0.25);
-      border: 1px solid var(--accent);
-      border-radius: 4px;
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
-      display: flex;
-      align-items: center;
-      padding-left: 8px;
-      font-size: 0.75rem;
-      white-space: nowrap;
-      overflow: hidden;
-      color: #fff;
-    }
-
     .editable { cursor: pointer; }
     .editable:hover {
       background-color: rgba(56, 189, 248, 0.15) !important;
@@ -301,30 +291,33 @@
   <div class="app-container">
     <header>
       <div class="brand-title">
-        <span class="badge-pro">PRO ENTERPRISE</span>
-        <h1>Filament Outsource Tracing</h1>
+        <!-- 前方新增圖片區 (可替換 src 路徑或上傳圖檔) -->
+        <img id="app-logo" class="brand-logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/></svg>" alt="Logo" title="雙擊可更改圖片網址">
+        <div>
+          <span class="badge-pro">PRO ENTERPRISE</span>
+          <!-- 字體放大兩倍的標題 -->
+          <h1>Filament Outsource Tracing</h1>
+        </div>
       </div>
     </header>
 
-    <!-- 分頁頁籤 -->
+    <!-- 分頁頁籤 (保留未打叉的項目) -->
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('tracker-tab')">專案進度追蹤表</button>
-      <button class="tab-btn" onclick="switchTab('gantt-tab')">自動生成甘特圖 (Gantt Chart)</button>
     </div>
 
     <!-- 工作表標籤列 (Excel 樣式) -->
     <div class="sheet-bar">
       <div id="sheets-container" style="display: flex; gap: 6px;"></div>
-      <button id="add-sheet-btn" class="btn" style="padding: 2px 8px; font-size: 0.8rem;" title="新增工作表">➕</button>
-      <button id="copy-sheet-btn" class="btn" style="padding: 2px 8px; font-size: 0.8rem;" title="複製當前工作表">📋 複製工作表</button>
+      <button id="add-sheet-btn" class="btn" style="padding: 2px 8px; font-size: 0.8rem;" title="新增工作表">新增工作表</button>
+      <button id="copy-sheet-btn" class="btn" style="padding: 2px 8px; font-size: 0.8rem;" title="複製當前工作表">複製工作表</button>
     </div>
 
-    <!-- 頁面一：專案進度追蹤表 -->
+    <!-- 專案進度追蹤表 -->
     <div id="tracker-tab" class="tab-content active">
       <div class="toolbar" style="padding: 12px 16px 0 16px;">
-        <button id="add-row-btn" class="btn btn-primary">➕ 新增料號項目</button>
-        <button id="add-col-btn" class="btn btn-primary">➕ 新增自訂欄位</button>
-        <button id="export-tracker-img-btn" class="btn btn-success">匯出追蹤表圖片 (PNG)</button>
+        <button id="add-row-btn" class="btn btn-primary">新增料號項目</button>
+        <button id="add-col-btn" class="btn btn-primary">新增自訂欄位</button>
       </div>
       <div id="tracker-export-area" style="padding: 12px 16px;">
         <table>
@@ -334,19 +327,6 @@
       </div>
     </div>
 
-    <!-- 頁面二：動態甘特圖 -->
-    <div id="gantt-tab" class="tab-content">
-      <div class="toolbar" style="padding: 12px 20px 0 20px; justify-content: flex-end;">
-        <button id="export-gantt-img-btn" class="btn btn-success">匯出甘特圖圖片 (PNG)</button>
-      </div>
-      <div id="gantt-export-area" style="padding: 12px 20px 20px 20px; overflow-x: auto;">
-        <h3 style="color: var(--accent); margin-top: 0;">📊 採購時程動態甘特圖 (Gantt Chart)</h3>
-        <table class="gantt-table">
-          <thead id="gantt-thead"></thead>
-          <tbody id="gantt-tbody"></tbody>
-        </table>
-      </div>
-    </div>
   </div>
 
   <script>
@@ -439,17 +419,24 @@
     let draggedColIndex = null;
     let draggedSheetIndex = null;
 
-    // 切換頁籤 (Tab)
+    // 雙擊 Logo 圖片可更新圖片網址
+    document.getElementById('app-logo').ondblclick = () => {
+      const newUrl = prompt("請輸入 Logo 圖片網址 (URL)：", document.getElementById('app-logo').src);
+      if (newUrl) {
+        document.getElementById('app-logo').src = newUrl;
+        localStorage.setItem('outsource_filament_logo', newUrl);
+      }
+    };
+    if (localStorage.getItem('outsource_filament_logo')) {
+      document.getElementById('app-logo').src = localStorage.getItem('outsource_filament_logo');
+    }
+
+    // 頁籤切換邏輯 (保留以防未來擴充)
     window.switchTab = (tabId) => {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
       event.target.classList.add('active');
       document.getElementById(tabId).classList.add('active');
-
-      if (tabId === 'gantt-tab') {
-        renderGanttChart();
-      }
     };
 
     // 渲染工作表標籤 (Sheets) - 支援拖曳排序
@@ -626,14 +613,14 @@
 
         trBodyHtml += `
           <td style="text-align: center;">
-            <button class="action-btn" onclick="deleteRow(${index})" title="刪除項目">🗑️</button>
+            <button class="action-btn" onclick="deleteRow(${index})" title="刪除項目">刪除</button>
           </td>`;
         tr.innerHTML = trBodyHtml;
         tbody.appendChild(tr);
       });
     }
 
-    // 修改狀態 (下拉選單選擇: 未開始, 進行中, 已完成)
+    // 修改狀態 (下拉選單選擇)
     window.changeStatus = (index) => {
       const sheet = getActiveSheet();
       const currentStatus = sheet.data[index].status || '未開始';
@@ -720,64 +707,6 @@
       }
     };
 
-    // 動態生成甘特圖 Engine
-    function renderGanttChart() {
-      const ganttThead = document.getElementById('gantt-thead');
-      const ganttTbody = document.getElementById('gantt-tbody');
-      ganttThead.innerHTML = '';
-      ganttTbody.innerHTML = '';
-
-      const sheet = getActiveSheet();
-      if (sheet.data.length === 0) return;
-
-      const dates = sheet.data.flatMap(d => [new Date(d.startDate), new Date(d.endDate)]).filter(d => !isNaN(d));
-      if (dates.length === 0) return;
-
-      const minDate = new Date(Math.min(...dates));
-      const maxDate = new Date(Math.max(...dates));
-      
-      minDate.setDate(minDate.getDate() - 2);
-      maxDate.setDate(maxDate.getDate() + 5);
-
-      const dayDiff = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
-
-      let headerHtml = `<tr><th style="width: 250px;">品號 / 貨號</th>`;
-      for (let i = 0; i < dayDiff; i++) {
-        const curDate = new Date(minDate);
-        curDate.setDate(curDate.getDate() + i);
-        const dateStr = `${curDate.getMonth() + 1}/${curDate.getDate()}`;
-        headerHtml += `<th class="gantt-header-date">${dateStr}</th>`;
-      }
-      headerHtml += `</tr>`;
-      ganttThead.innerHTML = headerHtml;
-
-      sheet.data.forEach(row => {
-        const tr = document.createElement('tr');
-        let rowHtml = `<td style="font-size: 0.82rem;"><strong>${row.itemNo || '-'}</strong> (${row.sku || '-'})</td>`;
-
-        const start = new Date(row.startDate);
-        const end = new Date(row.endDate);
-
-        const startOffset = Math.max(0, Math.ceil((start - minDate) / (1000 * 60 * 60 * 24)));
-        const duration = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
-
-        for (let i = 0; i < dayDiff; i++) {
-          if (i === startOffset) {
-            rowHtml += `<td class="gantt-cell" colspan="${duration}">
-              <div class="gantt-bar-wrapper" style="width: 95%;">
-                ${row.purchaseNo || ''} - ${row.progress || 0}%
-              </div>
-            </td>`;
-            i += duration - 1;
-          } else {
-            rowHtml += `<td class="gantt-cell"></td>`;
-          }
-        }
-        tr.innerHTML = rowHtml;
-        ganttTbody.appendChild(tr);
-      });
-    }
-
     // 編輯單元格
     window.editCell = (index, key) => {
       const sheet = getActiveSheet();
@@ -839,20 +768,6 @@
     function saveWorkbook() {
       localStorage.setItem('outsource_filament_workbook', JSON.stringify(workbook));
       localStorage.setItem('outsource_filament_active_sheet', activeSheetId);
-    }
-
-    // 匯出截圖
-    document.getElementById('export-tracker-img-btn').onclick = () => exportImage('tracker-export-area', 'Filament_Outsource_Tracker');
-    document.getElementById('export-gantt-img-btn').onclick = () => exportImage('gantt-export-area', 'Filament_Outsource_Gantt');
-
-    function exportImage(areaId, fileName) {
-      const exportArea = document.getElementById(areaId);
-      html2canvas(exportArea, { backgroundColor: '#1e293b', scale: 2 }).then(canvas => {
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL("image/png");
-        link.download = `${fileName}_${new Date().toISOString().slice(0,10)}.png`;
-        link.click();
-      });
     }
 
     renderSheets();
