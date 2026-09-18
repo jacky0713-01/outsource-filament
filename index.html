@@ -291,32 +291,28 @@
   <div class="app-container">
     <header>
       <div class="brand-title">
-        <!-- 前方新增圖片區 (可替換 src 路徑或上傳圖檔) -->
         <img id="app-logo" class="brand-logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/></svg>" alt="Logo" title="雙擊可更改圖片網址">
         <div>
           <span class="badge-pro">PRO ENTERPRISE</span>
-          <!-- 字體放大兩倍的標題 -->
           <h1>Filament Outsource Tracing</h1>
         </div>
       </div>
     </header>
 
-    <!-- 分頁頁籤 (保留未打叉的項目) -->
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('tracker-tab')">專案進度追蹤表</button>
     </div>
 
-    <!-- 工作表標籤列 (Excel 樣式) -->
     <div class="sheet-bar">
       <div id="sheets-container" style="display: flex; gap: 6px;"></div>
       <button id="add-sheet-btn" class="btn" style="padding: 2px 8px; font-size: 0.8rem;" title="新增工作表">新增工作表</button>
       <button id="copy-sheet-btn" class="btn" style="padding: 2px 8px; font-size: 0.8rem;" title="複製當前工作表">複製工作表</button>
     </div>
 
-    <!-- 專案進度追蹤表 -->
     <div id="tracker-tab" class="tab-content active">
       <div class="toolbar" style="padding: 12px 16px 0 16px;">
-        <button id="add-row-btn" class="btn btn-primary">新增料號項目</button>
+        <!-- 按鈕文字更名為「新增列」 -->
+        <button id="add-row-btn" class="btn btn-primary">新增列</button>
         <button id="add-col-btn" class="btn btn-primary">新增自訂欄位</button>
       </div>
       <div id="tracker-export-area" style="padding: 12px 16px;">
@@ -330,7 +326,6 @@
   </div>
 
   <script>
-    // 依據對照圖片進行修正的資料陣列
     const imgData = [
       { sku: "FVSE-0036-4", itemNo: "10091-VWNE000", purchaseNo: "50001-111" },
       { sku: "FVSE-0525-4", itemNo: "10021-VWNE000", purchaseNo: "50001-112" },
@@ -402,7 +397,6 @@
       status: "未開始"
     }));
 
-    // 工作表資料結構 (Workbook Management)
     let workbook = JSON.parse(localStorage.getItem('outsource_filament_workbook')) || [
       { id: "sheet_1", name: "工作表 1", columns: defaultColumns, data: initialData }
     ];
@@ -419,7 +413,6 @@
     let draggedColIndex = null;
     let draggedSheetIndex = null;
 
-    // 雙擊 Logo 圖片可更新圖片網址
     document.getElementById('app-logo').ondblclick = () => {
       const newUrl = prompt("請輸入 Logo 圖片網址 (URL)：", document.getElementById('app-logo').src);
       if (newUrl) {
@@ -431,7 +424,6 @@
       document.getElementById('app-logo').src = localStorage.getItem('outsource_filament_logo');
     }
 
-    // 頁籤切換邏輯 (保留以防未來擴充)
     window.switchTab = (tabId) => {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -439,7 +431,6 @@
       document.getElementById(tabId).classList.add('active');
     };
 
-    // 渲染工作表標籤 (Sheets) - 支援拖曳排序
     function renderSheets() {
       sheetsContainer.innerHTML = '';
       workbook.forEach((sheet, index) => {
@@ -453,7 +444,6 @@
           ${workbook.length > 1 ? `<span class="sheet-close" onclick="deleteSheet('${sheet.id}', event)">✕</span>` : ''}
         `;
 
-        // 工作表點擊切換
         tab.onclick = (e) => {
           if (e.target.classList.contains('sheet-close')) return;
           activeSheetId = sheet.id;
@@ -462,7 +452,6 @@
           renderTable();
         };
 
-        // 工作表拖曳事件
         tab.ondragstart = (e) => {
           draggedSheetIndex = index;
           e.dataTransfer.effectAllowed = 'move';
@@ -496,7 +485,6 @@
       });
     }
 
-    // 重命名工作表
     window.renameSheet = (sheetId) => {
       const sheet = workbook.find(s => s.id === sheetId);
       const newName = prompt("請輸入新的工作表名稱：", sheet.name);
@@ -507,7 +495,6 @@
       }
     };
 
-    // 新增工作表
     document.getElementById('add-sheet-btn').onclick = () => {
       const newId = 'sheet_' + Date.now();
       const newSheet = {
@@ -523,7 +510,6 @@
       renderTable();
     };
 
-    // 複製當前工作表
     document.getElementById('copy-sheet-btn').onclick = () => {
       const currentSheet = getActiveSheet();
       const newId = 'sheet_' + Date.now();
@@ -540,7 +526,6 @@
       renderTable();
     };
 
-    // 刪除工作表
     window.deleteSheet = (sheetId, event) => {
       event.stopPropagation();
       if (workbook.length <= 1) return;
@@ -555,11 +540,9 @@
       }
     };
 
-    // 渲染表格
     function renderTable() {
       const sheet = getActiveSheet();
 
-      // 渲染表頭 (雙擊修改欄位名稱, 拖曳排序)
       let trHeadHtml = '<tr>';
       sheet.columns.forEach((col, index) => {
         trHeadHtml += `
@@ -577,7 +560,6 @@
       trHeadHtml += `<th style="width: 5%; text-align: center;">操作</th></tr>`;
       thead.innerHTML = trHeadHtml;
 
-      // 渲染內容
       tbody.innerHTML = '';
       sheet.data.forEach((row, index) => {
         const tr = document.createElement('tr');
@@ -620,7 +602,6 @@
       });
     }
 
-    // 修改狀態 (下拉選單選擇)
     window.changeStatus = (index) => {
       const sheet = getActiveSheet();
       const currentStatus = sheet.data[index].status || '未開始';
@@ -649,7 +630,6 @@
       }
     };
 
-    // 雙擊修改欄位名稱
     window.editColumnLabel = (colIndex) => {
       const sheet = getActiveSheet();
       const currentLabel = sheet.columns[colIndex].label;
@@ -661,7 +641,6 @@
       }
     };
 
-    // 拖曳欄位邏輯
     window.handleDragStart = (e) => {
       draggedColIndex = Number(e.currentTarget.getAttribute('data-index'));
       e.dataTransfer.effectAllowed = 'move';
@@ -692,7 +671,6 @@
       }
     };
 
-    // 刪除欄位
     window.deleteColumn = (colKey, event) => {
       event.stopPropagation();
       const sheet = getActiveSheet();
@@ -707,7 +685,6 @@
       }
     };
 
-    // 編輯單元格
     window.editCell = (index, key) => {
       const sheet = getActiveSheet();
       const currentVal = sheet.data[index][key] || '';
@@ -720,7 +697,6 @@
       }
     };
 
-    // 刪除列
     window.deleteRow = (index) => {
       const sheet = getActiveSheet();
       if (confirm(`確定要刪除這筆資料嗎？`)) {
@@ -730,7 +706,7 @@
       }
     };
 
-    // 新增料號項目
+    // 改為「新增列」：點擊後直接建立預設空白列，不需彈窗輸入
     document.getElementById('add-row-btn').onclick = () => {
       const sheet = getActiveSheet();
       const newItem = {};
@@ -742,7 +718,7 @@
         } else if (col.key === 'status') {
           newItem[col.key] = "未開始";
         } else {
-          newItem[col.key] = prompt(`請輸入 ${col.label}：`, "") || "-";
+          newItem[col.key] = "-";
         }
       });
       sheet.data.push(newItem);
@@ -750,7 +726,6 @@
       renderTable();
     };
 
-    // 新增自訂欄位
     document.getElementById('add-col-btn').onclick = () => {
       const colLabel = prompt("請輸入新欄位名稱（例如：備註、供應商）：");
       if (!colLabel) return;
