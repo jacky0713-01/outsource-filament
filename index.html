@@ -326,356 +326,370 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDrRzvbrpq87mDlHE8vpoAfWxwNS5aOV2E",
-      authDomain: "outsourcefilament.firebaseapp.com",
-      databaseURL: "https://outsourcefilament-default-rtdb.firebaseio.com",
-      projectId: "outsourcefilament",
-      storageBucket: "outsourcefilament.firebasestorage.app",
-      messagingSenderId: "2490212071",
-      appId: "1:2490212071:web:e7dd49a11c32ee4edfcc42",
-      measurementId: "G-5M1XTD79JT"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDrRzvbrpq87mDlHE8vpoAfWxwNS5aOV2E",
+    authDomain: "outsourcefilament.firebaseapp.com",
+    databaseURL: "https://outsourcefilament-default-rtdb.firebaseio.com",
+    projectId: "outsourcefilament",
+    storageBucket: "outsourcefilament.firebasestorage.app",
+    messagingSenderId: "2490212071",
+    appId: "1:2490212071:web:e7dd49a11c32ee4edfcc42",
+    measurementId: "G-5M1XTD79JT"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const dbRef = ref(db, 'outsource_filament_app');
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const dbRef = ref(db, 'outsource_filament_app');
 
-    const defaultColumns = [
-      { key: "itemNo", label: "品號", isSystem: false },
-      { key: "sku", label: "貨號", isSystem: false },
-      { key: "purchaseNo", label: "採購料號", isSystem: false },
-      { key: "startDate", label: "開始日期", isSystem: false },
-      { key: "endDate", label: "結束日期", isSystem: false },
-      { key: "progress", label: "進度 (%)", isSystem: false },
-      { key: "status", label: "狀態", isSystem: false }
-    ];
+  const defaultColumns = [
+    { key: "itemNo", label: "品號", isSystem: false },
+    { key: "sku", label: "貨號", isSystem: false },
+    { key: "purchaseNo", label: "採購料號", isSystem: false },
+    { key: "startDate", label: "開始日期", isSystem: false },
+    { key: "endDate", label: "結束日期", isSystem: false },
+    { key: "progress", label: "進度 (%)", isSystem: false },
+    { key: "status", label: "狀態", isSystem: false }
+  ];
 
-    const imgData = [
-      { sku: "FVSE-0036-4", itemNo: "10091-VWNE000", purchaseNo: "50001-111" },
-      { sku: "FVSE-0525-4", itemNo: "10021-VWNE000", purchaseNo: "50001-112" },
-      { sku: "FVSE-0032-4", itemNo: "14967-VWNE001", purchaseNo: "50001-113" },
-      { sku: "FVSE-0068", itemNo: "10014-VWTE000", purchaseNo: "50001-114" },
-      { sku: "FV80-0433", itemNo: "10207-FWTE000", purchaseNo: "50001-115" }
-    ];
+  const imgData = [
+    { sku: "FVSE-0036-4", itemNo: "10091-VWNE000", purchaseNo: "50001-111" },
+    { sku: "FVSE-0525-4", itemNo: "10021-VWNE000", purchaseNo: "50001-112" },
+    { sku: "FVSE-0032-4", itemNo: "14967-VWNE001", purchaseNo: "50001-113" },
+    { sku: "FVSE-0068", itemNo: "10014-VWTE000", purchaseNo: "50001-114" },
+    { sku: "FV80-0433", itemNo: "10207-FWTE000", purchaseNo: "50001-115" }
+  ];
 
-    const initialData = imgData.map(item => ({
-      itemNo: item.itemNo,
-      sku: item.sku,
-      purchaseNo: item.purchaseNo,
-      startDate: "2026-03-01",
-      endDate: "2026-03-15",
-      progress: 0,
-      status: "未開始"
-    }));
+  const initialData = imgData.map(item => ({
+    itemNo: item.itemNo,
+    sku: item.sku,
+    purchaseNo: item.purchaseNo,
+    startDate: "2026-03-01",
+    endDate: "2026-03-15",
+    progress: 0,
+    status: "未開始"
+  }));
 
-    const defaultLogo = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/></svg>";
+  const defaultLogo = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/></svg>";
 
-    let appState = {
-      logoUrl: defaultLogo,
-      workbook: [
-        { id: "sheet_1", name: "工程及製造追蹤項目", columns: defaultColumns, data: initialData },
-        { id: "sheet_2", name: "採購追蹤項目", columns: defaultColumns, data: [] },
-        { id: "sheet_3", name: "品保追蹤項目", columns: defaultColumns, data: [] }
-      ]
-    };
+  let appState = {
+    logoUrl: defaultLogo,
+    workbook: [
+      { id: "sheet_1", name: "工程及製造追蹤項目", columns: defaultColumns, data: initialData },
+      { id: "sheet_2", name: "採購追蹤項目", columns: defaultColumns, data: [] },
+      { id: "sheet_3", name: "品保追蹤項目", columns: defaultColumns, data: [] }
+    ]
+  };
 
-    let activeSheetId = "sheet_1";
-    const logoEl = document.getElementById('app-logo');
+  let activeSheetId = "sheet_1";
+  const logoEl = document.getElementById('app-logo');
 
-    // 💡 點擊 Logo 輸入新圖片網址
-    logoEl.ondblclick = () => {
-      const newUrl = prompt("請輸入新 Logo 圖片的 URL 網址：", logoEl.src);
-      if (newUrl && newUrl.trim() !== "") {
-        appState.logoUrl = newUrl.trim();
-        saveData();
+  // 💡 1. 優先從本地 快取 (LocalStorage) 讀取，達成秒開網頁
+  const cachedData = localStorage.getItem('filament_app_data');
+  if (cachedData) {
+    try {
+      appState = JSON.parse(cachedData);
+    } catch(e) { console.error("快取解析失敗", e); }
+  }
+  
+  // 💡 2. 頁面載入後立即繪製一次（不需等待雲端回應）
+  renderApp();
+
+  logoEl.ondblclick = () => {
+    const newUrl = prompt("請輸入新 Logo 圖片的 URL 網址：", logoEl.src);
+    if (newUrl && newUrl.trim() !== "") {
+      appState.logoUrl = newUrl.trim();
+      saveData();
+    }
+  };
+
+  // 💡 3. 監聽 Firebase 雲端資料 (異步更新)
+  onValue(dbRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data && data.workbook && data.workbook.length > 0) {
+      appState = data;
+      if (!appState.logoUrl) appState.logoUrl = defaultLogo;
+      
+      // 校正目前選中的 Sheet
+      if (!appState.workbook.find(s => s.id === activeSheetId)) {
+        activeSheetId = appState.workbook[0].id;
       }
-    };
 
-    // 監聽雲端資料
-    onValue(dbRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        appState = data;
-        if (!appState.logoUrl) appState.logoUrl = defaultLogo;
-        if (!appState.workbook.find(s => s.id === activeSheetId)) {
-          activeSheetId = appState.workbook[0].id;
-        }
-      } else {
-        saveData();
+      // 將最新的雲端資料更新至本地快取
+      localStorage.setItem('filament_app_data', JSON.stringify(appState));
+      
+      // 雲端回應後重新渲染畫面，確保呈現最新紀錄
+      renderApp();
+    }
+  }, (error) => {
+    console.warn("雲端連線失敗，目前顯示離線快取資料", error);
+  });
+
+  function saveData() {
+    // 立即更新快取與畫面
+    localStorage.setItem('filament_app_data', JSON.stringify(appState));
+    renderApp();
+
+    // 異步寫入雲端
+    set(dbRef, appState).catch(err => {
+      console.error("Firebase 寫入失敗", err);
+    });
+  }
+
+  function renderApp() {
+    logoEl.src = appState.logoUrl || defaultLogo;
+    renderSheets();
+    renderTable();
+  }
+
+  function getActiveSheet() {
+    return appState.workbook.find(s => s.id === activeSheetId) || appState.workbook[0];
+  }
+
+  window.switchTab = (tabId) => {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+  };
+
+  function renderSheets() {
+    const sheetsContainer = document.getElementById('sheets-container');
+    sheetsContainer.innerHTML = '';
+    appState.workbook.forEach((sheet, index) => {
+      const tab = document.createElement('div');
+      tab.className = `sheet-tab ${sheet.id === activeSheetId ? 'active' : ''}`;
+      tab.innerHTML = `
+        <span class="sheet-name">${sheet.name}</span>
+        ${appState.workbook.length > 1 ? `<span class="sheet-close">✕</span>` : ''}
+      `;
+
+      tab.querySelector('.sheet-name').ondblclick = () => renameSheet(sheet.id);
+
+      const closeSpan = tab.querySelector('.sheet-close');
+      if (closeSpan) {
+        closeSpan.onclick = (e) => deleteSheet(sheet.id, e);
       }
-      renderApp();
-    }, (error) => {
-      console.warn("雲端讀取失敗，改用 LocalStorage：", error);
-      const local = localStorage.getItem('filament_app_data');
-      if (local) appState = JSON.parse(local);
-      renderApp();
+
+      tab.onclick = (e) => {
+        if (e.target.classList.contains('sheet-close')) return;
+        activeSheetId = sheet.id;
+        renderApp();
+      };
+
+      sheetsContainer.appendChild(tab);
+    });
+  }
+
+  function renameSheet(sheetId) {
+    const sheet = appState.workbook.find(s => s.id === sheetId);
+    const newName = prompt("請輸入新的工作表名稱：", sheet.name);
+    if (newName) {
+      sheet.name = newName.trim();
+      saveData();
+    }
+  }
+
+  document.getElementById('add-sheet-btn').onclick = () => {
+    const newId = 'sheet_' + Date.now();
+    appState.workbook.push({
+      id: newId,
+      name: `工作表 ${appState.workbook.length + 1}`,
+      columns: JSON.parse(JSON.stringify(defaultColumns)),
+      data: []
+    });
+    activeSheetId = newId;
+    saveData();
+  };
+
+  document.getElementById('copy-sheet-btn').onclick = () => {
+    const currentSheet = getActiveSheet();
+    const newId = 'sheet_' + Date.now();
+    appState.workbook.push({
+      id: newId,
+      name: `${currentSheet.name} (副本)`,
+      columns: JSON.parse(JSON.stringify(currentSheet.columns)),
+      data: JSON.parse(JSON.stringify(currentSheet.data || []))
+    });
+    activeSheetId = newId;
+    saveData();
+  };
+
+  function deleteSheet(sheetId, event) {
+    event.stopPropagation();
+    if (appState.workbook.length <= 1) return;
+    if (confirm("確定要刪除此工作表嗎？")) {
+      appState.workbook = appState.workbook.filter(s => s.id !== sheetId);
+      if (activeSheetId === sheetId) activeSheetId = appState.workbook[0].id;
+      saveData();
+    }
+  }
+
+  function renderTable() {
+    const sheet = getActiveSheet();
+    if (!sheet || !sheet.data) return;
+
+    const thead = document.getElementById('table-head');
+    const tbody = document.getElementById('table-body');
+
+    let trHeadHtml = '<tr>';
+    sheet.columns.forEach((col, index) => {
+      trHeadHtml += `
+        <th class="th-col" data-index="${index}">
+          ${col.label}
+          <span class="del-col-btn" title="刪除欄位">✕</span>
+        </th>`;
+    });
+    trHeadHtml += `<th style="width: 5%; text-align: center;">操作</th></tr>`;
+    thead.innerHTML = trHeadHtml;
+
+    thead.querySelectorAll('.th-col').forEach(th => {
+      const index = Number(th.getAttribute('data-index'));
+      th.ondblclick = () => editColumnLabel(index);
+      const delBtn = th.querySelector('.del-col-btn');
+      if (delBtn) delBtn.onclick = (e) => deleteColumn(sheet.columns[index].key, e);
     });
 
-    function saveData() {
-      // 同步儲存至 Firebase 與 LocalStorage
-      set(dbRef, appState).catch(err => {
-        console.error("Firebase 寫入權限受限，僅儲存在本機", err);
-      });
-      localStorage.setItem('filament_app_data', JSON.stringify(appState));
-      renderApp();
-    }
-
-    function renderApp() {
-      logoEl.src = appState.logoUrl || defaultLogo;
-      renderSheets();
-      renderTable();
-    }
-
-    function getActiveSheet() {
-      return appState.workbook.find(s => s.id === activeSheetId) || appState.workbook[0];
-    }
-
-    window.switchTab = (tabId) => {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById(tabId).classList.add('active');
-    };
-
-    function renderSheets() {
-      const sheetsContainer = document.getElementById('sheets-container');
-      sheetsContainer.innerHTML = '';
-      appState.workbook.forEach((sheet, index) => {
-        const tab = document.createElement('div');
-        tab.className = `sheet-tab ${sheet.id === activeSheetId ? 'active' : ''}`;
-        tab.innerHTML = `
-          <span class="sheet-name">${sheet.name}</span>
-          ${appState.workbook.length > 1 ? `<span class="sheet-close">✕</span>` : ''}
-        `;
-
-        tab.querySelector('.sheet-name').ondblclick = () => renameSheet(sheet.id);
-
-        const closeSpan = tab.querySelector('.sheet-close');
-        if (closeSpan) {
-          closeSpan.onclick = (e) => deleteSheet(sheet.id, e);
-        }
-
-        tab.onclick = (e) => {
-          if (e.target.classList.contains('sheet-close')) return;
-          activeSheetId = sheet.id;
-          renderApp();
-        };
-
-        sheetsContainer.appendChild(tab);
-      });
-    }
-
-    function renameSheet(sheetId) {
-      const sheet = appState.workbook.find(s => s.id === sheetId);
-      const newName = prompt("請輸入新的工作表名稱：", sheet.name);
-      if (newName) {
-        sheet.name = newName.trim();
-        saveData();
-      }
-    }
-
-    document.getElementById('add-sheet-btn').onclick = () => {
-      const newId = 'sheet_' + Date.now();
-      appState.workbook.push({
-        id: newId,
-        name: `工作表 ${appState.workbook.length + 1}`,
-        columns: JSON.parse(JSON.stringify(defaultColumns)),
-        data: []
-      });
-      activeSheetId = newId;
-      saveData();
-    };
-
-    document.getElementById('copy-sheet-btn').onclick = () => {
-      const currentSheet = getActiveSheet();
-      const newId = 'sheet_' + Date.now();
-      appState.workbook.push({
-        id: newId,
-        name: `${currentSheet.name} (副本)`,
-        columns: JSON.parse(JSON.stringify(currentSheet.columns)),
-        data: JSON.parse(JSON.stringify(currentSheet.data || []))
-      });
-      activeSheetId = newId;
-      saveData();
-    };
-
-    function deleteSheet(sheetId, event) {
-      event.stopPropagation();
-      if (appState.workbook.length <= 1) return;
-      if (confirm("確定要刪除此工作表嗎？")) {
-        appState.workbook = appState.workbook.filter(s => s.id !== sheetId);
-        if (activeSheetId === sheetId) activeSheetId = appState.workbook[0].id;
-        saveData();
-      }
-    }
-
-    function renderTable() {
-      const sheet = getActiveSheet();
-      if (!sheet.data) sheet.data = [];
-
-      const thead = document.getElementById('table-head');
-      const tbody = document.getElementById('table-body');
-
-      let trHeadHtml = '<tr>';
-      sheet.columns.forEach((col, index) => {
-        trHeadHtml += `
-          <th class="th-col" data-index="${index}">
-            ${col.label}
-            <span class="del-col-btn" title="刪除欄位">✕</span>
-          </th>`;
-      });
-      trHeadHtml += `<th style="width: 5%; text-align: center;">操作</th></tr>`;
-      thead.innerHTML = trHeadHtml;
-
-      thead.querySelectorAll('.th-col').forEach(th => {
-        const index = Number(th.getAttribute('data-index'));
-        th.ondblclick = () => editColumnLabel(index);
-        const delBtn = th.querySelector('.del-col-btn');
-        if (delBtn) delBtn.onclick = (e) => deleteColumn(sheet.columns[index].key, e);
-      });
-
-      tbody.innerHTML = '';
-      sheet.data.forEach((row, index) => {
-        const tr = document.createElement('tr');
-        let trBodyHtml = '';
-        
-        sheet.columns.forEach(col => {
-          const val = row[col.key] !== undefined ? row[col.key] : '-';
-          if (col.key === 'progress') {
-            trBodyHtml += `
-              <td class="editable cell-edit" data-key="${col.key}">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" style="width: ${val}%;"></div>
-                  </div>
-                  <span style="font-size: 0.8rem; font-weight: 700;">${val}%</span>
-                </div>
-              </td>`;
-          } else if (col.key === 'status') {
-            let statusClass = 'status-todo';
-            if (val === '已完成' || row.progress == 100) statusClass = 'status-done';
-            else if (val === '進行中') statusClass = 'status-doing';
-            
-            trBodyHtml += `
-              <td class="editable cell-status">
-                <span class="status-badge ${statusClass}">${val || '未開始'} ▾</span>
-              </td>`;
-          } else {
-            trBodyHtml += `<td class="editable cell-edit" data-key="${col.key}">${val}</td>`;
-          }
-        });
-
-        trBodyHtml += `
-          <td style="text-align: center;">
-            <button class="action-btn btn-del-row" title="刪除項目">刪除</button>
-          </td>`;
-        tr.innerHTML = trBodyHtml;
-
-        tr.querySelectorAll('.cell-edit').forEach(td => {
-          const key = td.getAttribute('data-key');
-          td.ondblclick = () => editCell(index, key);
-        });
-
-        const statusTd = tr.querySelector('.cell-status');
-        if (statusTd) statusTd.onclick = () => changeStatus(index);
-
-        const delRowBtn = tr.querySelector('.btn-del-row');
-        if (delRowBtn) delRowBtn.onclick = () => deleteRow(index);
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    function editColumnLabel(colIndex) {
-      const sheet = getActiveSheet();
-      const currentLabel = sheet.columns[colIndex].label;
-      const newLabel = prompt("請修改欄位名稱：", currentLabel);
-      if (newLabel && newLabel.trim() !== "") {
-        sheet.columns[colIndex].label = newLabel.trim();
-        saveData();
-      }
-    }
-
-    function deleteColumn(colKey, event) {
-      event.stopPropagation();
-      const sheet = getActiveSheet();
-      if (sheet.columns.length <= 1) {
-        alert("至少需保留一個欄位！");
-        return;
-      }
-      if (confirm("確定要刪除此欄位嗎？")) {
-        sheet.columns = sheet.columns.filter(c => c.key !== colKey);
-        saveData();
-      }
-    }
-
-    function editCell(index, key) {
-      const sheet = getActiveSheet();
-      const currentVal = sheet.data[index][key] || '';
-      const newVal = prompt(`請修改內容：`, currentVal);
-
-      if (newVal !== null) {
-        sheet.data[index][key] = key === 'progress' ? Math.min(100, Math.max(0, parseInt(newVal) || 0)) : newVal.trim();
-        saveData();
-      }
-    }
-
-    function changeStatus(index) {
-      const sheet = getActiveSheet();
-      const currentStatus = sheet.data[index].status || '未開始';
-      const selected = prompt(`請選擇狀態 (輸入數字):\n1. 未開始\n2. 進行中\n3. 已完成`, currentStatus);
-
-      if (selected !== null) {
-        let newStatus = selected.trim();
-        if (newStatus === "1") newStatus = "未開始";
-        if (newStatus === "2") newStatus = "進行中";
-        if (newStatus === "3") newStatus = "已完成";
-
-        if (["未開始", "進行中", "已完成"].includes(newStatus)) {
-          sheet.data[index].status = newStatus;
-          if (newStatus === '已完成') sheet.data[index].progress = 100;
-          saveData();
-        }
-      }
-    }
-
-    function deleteRow(index) {
-      const sheet = getActiveSheet();
-      if (confirm(`確定要刪除這筆資料嗎？`)) {
-        sheet.data.splice(index, 1);
-        saveData();
-      }
-    }
-
-    document.getElementById('add-row-btn').onclick = () => {
-      const sheet = getActiveSheet();
-      if (!sheet.data) sheet.data = [];
-      const newItem = {};
+    tbody.innerHTML = '';
+    sheet.data.forEach((row, index) => {
+      const tr = document.createElement('tr');
+      let trBodyHtml = '';
+      
       sheet.columns.forEach(col => {
-        newItem[col.key] = col.key === 'progress' ? 0 : col.key === 'status' ? "未開始" : "-";
+        const val = row[col.key] !== undefined ? row[col.key] : '-';
+        if (col.key === 'progress') {
+          trBodyHtml += `
+            <td class="editable cell-edit" data-key="${col.key}">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" style="width: ${val}%;"></div>
+                </div>
+                <span style="font-size: 0.8rem; font-weight: 700;">${val}%</span>
+              </div>
+            </td>`;
+        } else if (col.key === 'status') {
+          let statusClass = 'status-todo';
+          if (val === '已完成' || row.progress == 100) statusClass = 'status-done';
+          else if (val === '進行中') statusClass = 'status-doing';
+          
+          trBodyHtml += `
+            <td class="editable cell-status">
+              <span class="status-badge ${statusClass}">${val || '未開始'} ▾</span>
+            </td>`;
+        } else {
+          trBodyHtml += `<td class="editable cell-edit" data-key="${col.key}">${val}</td>`;
+        }
       });
-      sheet.data.push(newItem);
+
+      trBodyHtml += `
+        <td style="text-align: center;">
+          <button class="action-btn btn-del-row" title="刪除項目">刪除</button>
+        </td>`;
+      tr.innerHTML = trBodyHtml;
+
+      tr.querySelectorAll('.cell-edit').forEach(td => {
+        const key = td.getAttribute('data-key');
+        td.ondblclick = () => editCell(index, key);
+      });
+
+      const statusTd = tr.querySelector('.cell-status');
+      if (statusTd) statusTd.onclick = () => changeStatus(index);
+
+      const delRowBtn = tr.querySelector('.btn-del-row');
+      if (delRowBtn) delRowBtn.onclick = () => deleteRow(index);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  function editColumnLabel(colIndex) {
+    const sheet = getActiveSheet();
+    const currentLabel = sheet.columns[colIndex].label;
+    const newLabel = prompt("請修改欄位名稱：", currentLabel);
+    if (newLabel && newLabel.trim() !== "") {
+      sheet.columns[colIndex].label = newLabel.trim();
       saveData();
-    };
+    }
+  }
 
-    document.getElementById('add-col-btn').onclick = () => {
-      const colLabel = prompt("請輸入新欄位名稱：");
-      if (!colLabel) return;
+  function deleteColumn(colKey, event) {
+    event.stopPropagation();
+    const sheet = getActiveSheet();
+    if (sheet.columns.length <= 1) {
+      alert("至少需保留一個欄位！");
+      return;
+    }
+    if (confirm("確定要刪除此欄位嗎？")) {
+      sheet.columns = sheet.columns.filter(c => c.key !== colKey);
+      saveData();
+    }
+  }
 
-      const sheet = getActiveSheet();
-      const colKey = 'custom_' + Date.now();
-      sheet.columns.push({ key: colKey, label: colLabel, isSystem: false });
+  function editCell(index, key) {
+    const sheet = getActiveSheet();
+    const currentVal = sheet.data[index][key] || '';
+    const newVal = prompt(`請修改內容：`, currentVal);
 
-      if (sheet.data) {
-        sheet.data.forEach(row => { row[colKey] = "-"; });
+    if (newVal !== null) {
+      sheet.data[index][key] = key === 'progress' ? Math.min(100, Math.max(0, parseInt(newVal) || 0)) : newVal.trim();
+      saveData();
+    }
+  }
+
+  function changeStatus(index) {
+    const sheet = getActiveSheet();
+    const currentStatus = sheet.data[index].status || '未開始';
+    const selected = prompt(`請選擇狀態 (輸入數字):\n1. 未開始\n2. 進行中\n3. 已完成`, currentStatus);
+
+    if (selected !== null) {
+      let newStatus = selected.trim();
+      if (newStatus === "1") newStatus = "未開始";
+      if (newStatus === "2") newStatus = "進行中";
+      if (newStatus === "3") newStatus = "已完成";
+
+      if (["未開始", "進行中", "已完成"].includes(newStatus)) {
+        sheet.data[index].status = newStatus;
+        if (newStatus === '已完成') sheet.data[index].progress = 100;
+        saveData();
       }
+    }
+  }
 
+  function deleteRow(index) {
+    const sheet = getActiveSheet();
+    if (confirm(`確定要刪除這筆資料嗎？`)) {
+      sheet.data.splice(index, 1);
       saveData();
-    };
-  </script>
+    }
+  }
+
+  document.getElementById('add-row-btn').onclick = () => {
+    const sheet = getActiveSheet();
+    if (!sheet.data) sheet.data = [];
+    const newItem = {};
+    sheet.columns.forEach(col => {
+      newItem[col.key] = col.key === 'progress' ? 0 : col.key === 'status' ? "未開始" : "-";
+    });
+    sheet.data.push(newItem);
+    saveData();
+  };
+
+  document.getElementById('add-col-btn').onclick = () => {
+    const colLabel = prompt("請輸入新欄位名稱：");
+    if (!colLabel) return;
+
+    const sheet = getActiveSheet();
+    const colKey = 'custom_' + Date.now();
+    sheet.columns.push({ key: colKey, label: colLabel, isSystem: false });
+
+    if (sheet.data) {
+      sheet.data.forEach(row => { row[colKey] = "-"; });
+    }
+
+    saveData();
+  };
+</script>
 </body>
 </html>
