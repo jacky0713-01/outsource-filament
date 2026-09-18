@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Filament Outsource Tracing</title>
+  <title>Filament Outsource Tracing - Cloud Version</title>
   <style>
     :root {
       --bg-color: #0b1329;
@@ -24,7 +24,7 @@
       height: 100%;
       margin: 0;
       padding: 0;
-      overflow: hidden; /* 徹底關閉視窗層級的滾動條 */
+      overflow: hidden;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-main);
@@ -38,7 +38,6 @@
       box-sizing: border-box;
     }
 
-    /* 頂部固定區（Logo、標題） */
     header {
       display: flex;
       justify-content: space-between;
@@ -85,7 +84,6 @@
       line-height: 1.1;
     }
 
-    /* 固定頁籤列 */
     .nav-tabs {
       display: flex;
       gap: 8px;
@@ -112,7 +110,6 @@
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
     }
 
-    /* 固定工作表頁籤 */
     .sheet-bar {
       display: flex;
       align-items: center;
@@ -159,16 +156,12 @@
       opacity: 0.7;
       cursor: pointer;
     }
-    .sheet-close:hover {
-      opacity: 1;
-      color: #f87171;
-    }
+    .sheet-close:hover { opacity: 1; color: #f87171; }
 
-    /* 主要容器 */
     .tab-content {
       display: none;
       flex: 1;
-      min-height: 0; /* 關鍵：防止內容把外層 Flex 撐開 */
+      min-height: 0;
       background-color: var(--card-bg);
       border-radius: 0 0 10px 10px;
       border: 1px solid var(--border-color);
@@ -178,7 +171,6 @@
 
     .tab-content.active { display: flex; flex-direction: column; }
 
-    /* 固定按鈕工具列 */
     .toolbar {
       display: flex;
       gap: 12px;
@@ -202,31 +194,21 @@
       transition: all 0.2s;
     }
 
-    .btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
     .btn-primary { background-color: #0284c7; color: #fff; border: none; }
     .btn-primary:hover { background-color: #0369a1; color: #fff; }
 
-    /* 唯一可滾動區域 */
     .table-scroll-container {
       flex: 1;
-      min-height: 0; /* 關鍵：強制產生內部垂直滾動 */
+      min-height: 0;
       overflow: auto;
       padding: 0 16px 12px 16px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
 
-    /* 凍結表格標頭 (th) */
     th {
-      background-color: #0f172a; /* 不透明底色，遮擋捲動資料 */
+      background-color: #0f172a;
       color: #94a3b8;
       font-weight: 700;
       font-size: 0.85rem;
@@ -234,8 +216,8 @@
       letter-spacing: 0.05em;
       padding: 12px 16px;
       border-bottom: 2px solid var(--border-color);
-      position: sticky; /* 凍結窗格效果 */
-      top: 0;            /* 固定在表格區域頂端 */
+      position: sticky;
+      top: 0;
       z-index: 10;
       user-select: none;
     }
@@ -308,7 +290,7 @@
       <div class="brand-title">
         <img id="app-logo" class="brand-logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z'/></svg>" alt="Logo" title="雙擊可更改圖片網址">
         <div>
-          <span class="badge-pro">PRO ENTERPRISE</span>
+          <span class="badge-pro">CLOUD ENTERPRISE</span>
           <h1>Filament Outsource Tracing</h1>
         </div>
       </div>
@@ -336,10 +318,38 @@
         </table>
       </div>
     </div>
-
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // 帶入您的 Firebase Config 金鑰
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrRzvbrpq87mDlHE8vpoAfWxwNS5aOV2E",
+      authDomain: "outsourcefilament.firebaseapp.com",
+      databaseURL: "https://outsourcefilament-default-rtdb.firebaseio.com",
+      projectId: "outsourcefilament",
+      storageBucket: "outsourcefilament.firebasestorage.app",
+      messagingSenderId: "2490212071",
+      appId: "1:2490212071:web:e7dd49a11c32ee4edfcc42",
+      measurementId: "G-5M1XTD79JT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, 'outsource_filament_workbook');
+
+    const defaultColumns = [
+      { key: "itemNo", label: "品號", isSystem: false },
+      { key: "sku", label: "貨號", isSystem: false },
+      { key: "purchaseNo", label: "採購料號", isSystem: false },
+      { key: "startDate", label: "開始日期", isSystem: false },
+      { key: "endDate", label: "結束日期", isSystem: false },
+      { key: "progress", label: "進度 (%)", isSystem: false },
+      { key: "status", label: "狀態", isSystem: false }
+    ];
+
     const imgData = [
       { sku: "FVSE-0036-4", itemNo: "10091-VWNE000", purchaseNo: "50001-111" },
       { sku: "FVSE-0525-4", itemNo: "10021-VWNE000", purchaseNo: "50001-112" },
@@ -391,16 +401,6 @@
       { sku: "12111-BWTE000", itemNo: "FAPX-0044-2", purchaseNo: "50001-158" }
     ];
 
-    const defaultColumns = [
-      { key: "itemNo", label: "品號", isSystem: false },
-      { key: "sku", label: "貨號", isSystem: false },
-      { key: "purchaseNo", label: "採購料號", isSystem: false },
-      { key: "startDate", label: "開始日期", isSystem: false },
-      { key: "endDate", label: "結束日期", isSystem: false },
-      { key: "progress", label: "進度 (%)", isSystem: false },
-      { key: "status", label: "狀態", isSystem: false }
-    ];
-
     const initialData = imgData.map(item => ({
       itemNo: item.itemNo,
       sku: item.sku,
@@ -411,16 +411,13 @@
       status: "未開始"
     }));
 
-    let workbook = JSON.parse(localStorage.getItem('outsource_filament_workbook')) || [
+    let workbook = [
       { id: "sheet_1", name: "工程及製造追蹤項目", columns: defaultColumns, data: initialData },
       { id: "sheet_2", name: "採購追蹤項目", columns: defaultColumns, data: [] },
       { id: "sheet_3", name: "品保追蹤項目", columns: defaultColumns, data: [] }
     ];
-    let activeSheetId = localStorage.getItem('outsource_filament_active_sheet') || workbook[0].id;
 
-    function getActiveSheet() {
-      return workbook.find(s => s.id === activeSheetId) || workbook[0];
-    }
+    let activeSheetId = "sheet_1";
 
     const thead = document.getElementById('table-head');
     const tbody = document.getElementById('table-body');
@@ -429,15 +426,27 @@
     let draggedColIndex = null;
     let draggedSheetIndex = null;
 
-    document.getElementById('app-logo').ondblclick = () => {
-      const newUrl = prompt("請輸入 Logo 圖片網址 (URL)：", document.getElementById('app-logo').src);
-      if (newUrl) {
-        document.getElementById('app-logo').src = newUrl;
-        localStorage.setItem('outsource_filament_logo', newUrl);
+    // 監聽雲端即時變更
+    onValue(dbRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        workbook = data;
+        if (!workbook.find(s => s.id === activeSheetId)) {
+          activeSheetId = workbook[0].id;
+        }
+      } else {
+        saveWorkbook();
       }
-    };
-    if (localStorage.getItem('outsource_filament_logo')) {
-      document.getElementById('app-logo').src = localStorage.getItem('outsource_filament_logo');
+      renderSheets();
+      renderTable();
+    });
+
+    function saveWorkbook() {
+      set(dbRef, workbook);
+    }
+
+    function getActiveSheet() {
+      return workbook.find(s => s.id === activeSheetId) || workbook[0];
     }
 
     window.switchTab = (tabId) => {
@@ -456,14 +465,21 @@
         tab.setAttribute('data-sheet-index', index);
         
         tab.innerHTML = `
-          <span class="sheet-name" ondblclick="renameSheet('${sheet.id}')">${sheet.name}</span>
-          ${workbook.length > 1 ? `<span class="sheet-close" onclick="deleteSheet('${sheet.id}', event)">✕</span>` : ''}
+          <span class="sheet-name">${sheet.name}</span>
+          ${workbook.length > 1 ? `<span class="sheet-close">✕</span>` : ''}
         `;
+
+        const nameSpan = tab.querySelector('.sheet-name');
+        nameSpan.ondblclick = () => renameSheet(sheet.id);
+
+        const closeSpan = tab.querySelector('.sheet-close');
+        if (closeSpan) {
+          closeSpan.onclick = (e) => deleteSheet(sheet.id, e);
+        }
 
         tab.onclick = (e) => {
           if (e.target.classList.contains('sheet-close')) return;
           activeSheetId = sheet.id;
-          localStorage.setItem('outsource_filament_active_sheet', activeSheetId);
           renderSheets();
           renderTable();
         };
@@ -479,9 +495,7 @@
           tab.classList.add('drag-over');
         };
 
-        tab.ondragleave = () => {
-          tab.classList.remove('drag-over');
-        };
+        tab.ondragleave = () => tab.classList.remove('drag-over');
 
         tab.ondrop = (e) => {
           e.preventDefault();
@@ -491,9 +505,7 @@
           if (draggedSheetIndex !== null && draggedSheetIndex !== targetIndex) {
             const movedSheet = workbook.splice(draggedSheetIndex, 1)[0];
             workbook.splice(targetIndex, 0, movedSheet);
-
             saveWorkbook();
-            renderSheets();
           }
         };
 
@@ -501,80 +513,81 @@
       });
     }
 
-    window.renameSheet = (sheetId) => {
+    function renameSheet(sheetId) {
       const sheet = workbook.find(s => s.id === sheetId);
       const newName = prompt("請輸入新的工作表名稱：", sheet.name);
       if (newName) {
         sheet.name = newName.trim();
         saveWorkbook();
-        renderSheets();
       }
-    };
+    }
 
     document.getElementById('add-sheet-btn').onclick = () => {
       const newId = 'sheet_' + Date.now();
-      const newSheet = {
+      workbook.push({
         id: newId,
         name: `工作表 ${workbook.length + 1}`,
         columns: JSON.parse(JSON.stringify(defaultColumns)),
         data: []
-      };
-      workbook.push(newSheet);
+      });
       activeSheetId = newId;
       saveWorkbook();
-      renderSheets();
-      renderTable();
     };
 
     document.getElementById('copy-sheet-btn').onclick = () => {
       const currentSheet = getActiveSheet();
       const newId = 'sheet_' + Date.now();
-      const copiedSheet = {
+      workbook.push({
         id: newId,
         name: `${currentSheet.name} (副本)`,
         columns: JSON.parse(JSON.stringify(currentSheet.columns)),
-        data: JSON.parse(JSON.stringify(currentSheet.data))
-      };
-      workbook.push(copiedSheet);
+        data: JSON.parse(JSON.stringify(currentSheet.data || []))
+      });
       activeSheetId = newId;
       saveWorkbook();
-      renderSheets();
-      renderTable();
     };
 
-    window.deleteSheet = (sheetId, event) => {
+    function deleteSheet(sheetId, event) {
       event.stopPropagation();
       if (workbook.length <= 1) return;
       if (confirm("確定要刪除此工作表嗎？")) {
         workbook = workbook.filter(s => s.id !== sheetId);
-        if (activeSheetId === sheetId) {
-          activeSheetId = workbook[0].id;
-        }
+        if (activeSheetId === sheetId) activeSheetId = workbook[0].id;
         saveWorkbook();
-        renderSheets();
-        renderTable();
       }
-    };
+    }
 
     function renderTable() {
       const sheet = getActiveSheet();
+      if (!sheet.data) sheet.data = [];
 
       let trHeadHtml = '<tr>';
       sheet.columns.forEach((col, index) => {
         trHeadHtml += `
           <th draggable="true" 
               data-index="${index}" 
-              ondragstart="handleDragStart(event)" 
-              ondragover="handleDragOver(event)" 
-              ondragleave="handleDragLeave(event)" 
-              ondrop="handleDrop(event)"
-              ondblclick="editColumnLabel(${index})">
+              class="th-col">
             ${col.label}
-            <span class="del-col-btn" onclick="deleteColumn('${col.key}', event)" title="刪除此欄位">✕</span>
+            <span class="del-col-btn" title="刪除此欄位">✕</span>
           </th>`;
       });
       trHeadHtml += `<th style="width: 5%; text-align: center;">操作</th></tr>`;
       thead.innerHTML = trHeadHtml;
+
+      const ths = thead.querySelectorAll('.th-col');
+      ths.forEach(th => {
+        const index = Number(th.getAttribute('data-index'));
+        th.ondblclick = () => editColumnLabel(index);
+        th.ondragstart = (e) => handleDragStart(e, index);
+        th.ondragover = handleDragOver;
+        th.ondragleave = handleDragLeave;
+        th.ondrop = (e) => handleDrop(e, index);
+
+        const delBtn = th.querySelector('.del-col-btn');
+        if (delBtn) {
+          delBtn.onclick = (e) => deleteColumn(sheet.columns[index].key, e);
+        }
+      });
 
       tbody.innerHTML = '';
       sheet.data.forEach((row, index) => {
@@ -585,7 +598,7 @@
           const val = row[col.key] !== undefined ? row[col.key] : '-';
           if (col.key === 'progress') {
             trBodyHtml += `
-              <td class="editable" ondblclick="editCell(${index}, '${col.key}')">
+              <td class="editable cell-edit" data-key="${col.key}">
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <div class="progress-bar-bg">
                     <div class="progress-bar-fill" style="width: ${val}%;"></div>
@@ -599,29 +612,40 @@
             else if (val === '進行中') statusClass = 'status-doing';
             
             trBodyHtml += `
-              <td class="editable" onclick="changeStatus(${index})">
+              <td class="editable cell-status">
                 <span class="status-badge ${statusClass}">${val || '未開始'} ▾</span>
               </td>`;
           } else if (col.key === 'itemNo') {
-            trBodyHtml += `<td class="editable" style="font-weight: 700; color: var(--accent);" ondblclick="editCell(${index}, '${col.key}')">${val}</td>`;
+            trBodyHtml += `<td class="editable cell-edit" data-key="${col.key}" style="font-weight: 700; color: var(--accent);">${val}</td>`;
           } else {
-            trBodyHtml += `<td class="editable" ondblclick="editCell(${index}, '${col.key}')">${val}</td>`;
+            trBodyHtml += `<td class="editable cell-edit" data-key="${col.key}">${val}</td>`;
           }
         });
 
         trBodyHtml += `
           <td style="text-align: center;">
-            <button class="action-btn" onclick="deleteRow(${index})" title="刪除項目">刪除</button>
+            <button class="action-btn btn-del-row" title="刪除項目">刪除</button>
           </td>`;
         tr.innerHTML = trBodyHtml;
+
+        tr.querySelectorAll('.cell-edit').forEach(td => {
+          const key = td.getAttribute('data-key');
+          td.ondblclick = () => editCell(index, key);
+        });
+
+        const statusTd = tr.querySelector('.cell-status');
+        if (statusTd) statusTd.onclick = () => changeStatus(index);
+
+        const delRowBtn = tr.querySelector('.btn-del-row');
+        if (delRowBtn) delRowBtn.onclick = () => deleteRow(index);
+
         tbody.appendChild(tr);
       });
     }
 
-    window.changeStatus = (index) => {
+    function changeStatus(index) {
       const sheet = getActiveSheet();
       const currentStatus = sheet.data[index].status || '未開始';
-      
       const options = ["未開始", "進行中", "已完成"];
       const selected = prompt(`請選擇狀態 (輸入數字或直接輸入名稱):\n1. 未開始\n2. 進行中\n3. 已完成`, currentStatus);
 
@@ -633,61 +657,52 @@
 
         if (options.includes(newStatus)) {
           sheet.data[index].status = newStatus;
-          if (newStatus === '已完成') {
-            sheet.data[index].progress = 100;
-          } else if (newStatus === '未開始' && sheet.data[index].progress === 100) {
-            sheet.data[index].progress = 0;
-          }
+          if (newStatus === '已完成') sheet.data[index].progress = 100;
+          else if (newStatus === '未開始' && sheet.data[index].progress === 100) sheet.data[index].progress = 0;
           saveWorkbook();
-          renderTable();
         } else {
           alert("請選擇有效的狀態：未開始、進行中 或 已完成");
         }
       }
-    };
+    }
 
-    window.editColumnLabel = (colIndex) => {
+    function editColumnLabel(colIndex) {
       const sheet = getActiveSheet();
       const currentLabel = sheet.columns[colIndex].label;
       const newLabel = prompt("請修改欄位名稱：", currentLabel);
       if (newLabel && newLabel.trim() !== "") {
         sheet.columns[colIndex].label = newLabel.trim();
         saveWorkbook();
-        renderTable();
       }
-    };
+    }
 
-    window.handleDragStart = (e) => {
-      draggedColIndex = Number(e.currentTarget.getAttribute('data-index'));
+    function handleDragStart(e, index) {
+      draggedColIndex = index;
       e.dataTransfer.effectAllowed = 'move';
-    };
+    }
 
-    window.handleDragOver = (e) => {
+    function handleDragOver(e) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
       e.currentTarget.classList.add('drag-over');
-    };
+    }
 
-    window.handleDragLeave = (e) => {
+    function handleDragLeave(e) {
       e.currentTarget.classList.remove('drag-over');
-    };
+    }
 
-    window.handleDrop = (e) => {
+    function handleDrop(e, targetIndex) {
       e.preventDefault();
       e.currentTarget.classList.remove('drag-over');
-      const targetIndex = Number(e.currentTarget.getAttribute('data-index'));
-
       if (draggedColIndex !== null && draggedColIndex !== targetIndex) {
         const sheet = getActiveSheet();
         const movedCol = sheet.columns.splice(draggedColIndex, 1)[0];
         sheet.columns.splice(targetIndex, 0, movedCol);
-
         saveWorkbook();
-        renderTable();
       }
-    };
+    }
 
-    window.deleteColumn = (colKey, event) => {
+    function deleteColumn(colKey, event) {
       event.stopPropagation();
       const sheet = getActiveSheet();
       if (sheet.columns.length <= 1) {
@@ -697,11 +712,10 @@
       if (confirm("確定要刪除此欄位嗎？")) {
         sheet.columns = sheet.columns.filter(c => c.key !== colKey);
         saveWorkbook();
-        renderTable();
       }
-    };
+    }
 
-    window.editCell = (index, key) => {
+    function editCell(index, key) {
       const sheet = getActiveSheet();
       const currentVal = sheet.data[index][key] || '';
       const newVal = prompt(`請修改內容：`, currentVal);
@@ -709,21 +723,20 @@
       if (newVal !== null) {
         sheet.data[index][key] = key === 'progress' ? Math.min(100, Math.max(0, parseInt(newVal) || 0)) : newVal.trim();
         saveWorkbook();
-        renderTable();
       }
-    };
+    }
 
-    window.deleteRow = (index) => {
+    function deleteRow(index) {
       const sheet = getActiveSheet();
       if (confirm(`確定要刪除這筆資料嗎？`)) {
         sheet.data.splice(index, 1);
         saveWorkbook();
-        renderTable();
       }
-    };
+    }
 
     document.getElementById('add-row-btn').onclick = () => {
       const sheet = getActiveSheet();
+      if (!sheet.data) sheet.data = [];
       const newItem = {};
       sheet.columns.forEach(col => {
         if (col.key === 'startDate' || col.key === 'endDate') {
@@ -738,7 +751,6 @@
       });
       sheet.data.push(newItem);
       saveWorkbook();
-      renderTable();
     };
 
     document.getElementById('add-col-btn').onclick = () => {
@@ -749,19 +761,12 @@
       const colKey = 'custom_' + Date.now();
       sheet.columns.push({ key: colKey, label: colLabel, isSystem: false });
 
-      sheet.data.forEach(row => { row[colKey] = "-"; });
+      if (sheet.data) {
+        sheet.data.forEach(row => { row[colKey] = "-"; });
+      }
 
       saveWorkbook();
-      renderTable();
     };
-
-    function saveWorkbook() {
-      localStorage.setItem('outsource_filament_workbook', JSON.stringify(workbook));
-      localStorage.setItem('outsource_filament_active_sheet', activeSheetId);
-    }
-
-    renderSheets();
-    renderTable();
   </script>
 </body>
 </html>
